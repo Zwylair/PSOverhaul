@@ -3,15 +3,14 @@
 	"id": "pisskaland_overhaul",
 	"version": "${version}",
 	"name": "PisskaLandOverhaul",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Some things to make PisskaLand more funny",
 	"authors": [
 		"Zwylair"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Zwylair/PisskaLandOverhaul"
 	},
-	"license": "MIT",
+	"license": "CC0-1.0",
 	"icon": "assets/pisskaland_overhaul/icon.png",
 	"environment": "*",
 	"entrypoints": {
