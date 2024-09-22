@@ -25,4 +25,4 @@
 
 ## License
 
-This project is under the [MIT license](./LICENSE).
+This project is under the [Creative Commons license](./LICENSE).
