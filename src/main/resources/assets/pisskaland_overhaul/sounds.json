@@ -1,0 +1,10 @@
+{
+  "no_sound": {
+    "subtitle": "sounds.pisskaland_overhaul.no_sound",
+    "sounds": ["pisskaland_overhaul:no_sound"]
+  },
+  "server_anthem": {
+    "subtitle": "sounds.pisskaland_overhaul.server_anthem",
+    "sounds": ["pisskaland_overhaul:server_anthem"]
+  }
+}

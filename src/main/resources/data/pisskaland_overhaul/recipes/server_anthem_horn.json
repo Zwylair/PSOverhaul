@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [ { "item": "minecraft:goat_horn" } ],
+  "result": {
+    "item": "pisskaland_overhaul:server_anthem_horn",
+    "count": 1
+  }
+}
