@@ -3,10 +3,12 @@ package zwylair.pisskaland_overhaul
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.util.Identifier
 import zwylair.pisskaland_overhaul.blocks.ModBlocks
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 import zwylair.pisskaland_overhaul.items.ModItems
+import zwylair.pisskaland_overhaul.commands.MoneyManage
 import zwylair.pisskaland_overhaul.soundevents.ModSoundEvents
 
 class PSO : ModInitializer {
@@ -23,6 +25,9 @@ class PSO : ModInitializer {
         ModItemGroups.init()
         ModBlocks.init()
         ModItems.init()
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+            MoneyManage.register(dispatcher)
+        }
 
         LOGGER.info("")
         LOGGER.info("PisskaLandOverhaul has been initialized!")
