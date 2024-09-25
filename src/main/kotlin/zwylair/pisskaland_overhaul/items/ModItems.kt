@@ -12,11 +12,13 @@ import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups.PSO_ITEMGROUP_REG_KEY
 
 object ModItems {
-    lateinit var STORM_SCROLL: ModItem
+    lateinit var WALLET: ModItem
+    lateinit var SVOBUCKS: ModItem
     var SERVER_ANTHEM_HORN = ServerAnthemHorn()
 
     fun init() {
-        STORM_SCROLL = register(StormScroll())
+        WALLET = register(WalletItem())
+        SVOBUCKS = register(SVOBucks())
         register(SERVER_ANTHEM_HORN, PSO.id("server_anthem_horn"), PSO_ITEMGROUP_REG_KEY)
     }
 

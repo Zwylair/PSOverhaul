@@ -1,7 +1,10 @@
 {
   "itemGroup.pisskaland_overhaul:main_item_group": "PisskaLand Overhaul",
   "block.pisskaland_overhaul.electrified_copper_block": "Electrified Copper Block",
-  "item.pisskaland_overhaul.storm_scroll": "Storm Scroll",
+  "item.pisskaland_overhaul.wallet": "Wallet",
+  "item.pisskaland_overhaul.wallet_tooltip_money_count": "Money count",
+  "item.pisskaland_overhaul.wallet_tooltip_owner": "Owner",
+  "item.pisskaland_overhaul.svobucks": "SVObucks",
   "item.pisskaland_overhaul.server_anthem_horn": "PisskaLand Anthem",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem"
 }
