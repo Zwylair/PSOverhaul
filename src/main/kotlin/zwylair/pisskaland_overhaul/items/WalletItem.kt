@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.registry.RegistryKey
 import net.minecraft.util.ClickType
 import net.minecraft.util.Hand
@@ -36,8 +37,8 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     }
 
     override fun appendTooltip(stack: ItemStack?, world: World?, tooltip: MutableList<Text?>?, context: TooltipContext?) {
-        val ownerTooltip = Text.translatable("item.${PSO.MODID}.wallet_tooltip_owner").append(": ${ownerName}")
-        val moneyCountTooltip = Text.translatable("item.${PSO.MODID}.wallet_tooltip_money_count").append(": ${moneyCount}")
+        val ownerTooltip = Text.translatable("item.${PSO.MODID}.wallet_tooltip_owner").append(": $ownerName")
+        val moneyCountTooltip = Text.translatable("item.${PSO.MODID}.wallet_tooltip_money_count").append(": $moneyCount")
 
         tooltip?.add(ownerTooltip.formatted(Formatting.GRAY))
         tooltip?.add(moneyCountTooltip.formatted(Formatting.GRAY))
