@@ -12,6 +12,7 @@ import zwylair.pisskaland_overhaul.commands.MoneyManage
 import zwylair.pisskaland_overhaul.events.PlayerBlockBreak
 import zwylair.pisskaland_overhaul.soundevents.ModSoundEvents
 import zwylair.pisskaland_overhaul.events.ServerLivingEntity
+import zwylair.pisskaland_overhaul.events.ServerTick
 
 class PSO : ModInitializer {
     companion object {
@@ -32,6 +33,7 @@ class PSO : ModInitializer {
         }
         ServerLivingEntity.register()
         PlayerBlockBreak.register()
+        ServerTick.register()
 
         LOGGER.info("")
         LOGGER.info("PisskaLandOverhaul has been initialized!")
