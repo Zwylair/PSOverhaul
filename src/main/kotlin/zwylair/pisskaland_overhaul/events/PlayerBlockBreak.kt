@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object PlayerBlockBreak {
@@ -19,6 +20,8 @@ object PlayerBlockBreak {
     )
 
     fun register() {
+        PSO.LOGGER.info("Trying to register PlayerBlockBreak events")
+
         PlayerBlockBreakEvents.AFTER.register(::breakBlock)
     }
 

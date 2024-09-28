@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.world.World
+import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ServerTick {
@@ -12,6 +13,8 @@ object ServerTick {
     var checkForElytraTimeoutCount = 1 * 20
 
     fun register() {
+        PSO.LOGGER.info("Trying to register ServerTick events")
+
         ServerTickEvents.END_WORLD_TICK.register(::checkAndRemoveElytra)
     }
 
@@ -29,8 +32,10 @@ object ServerTick {
 
                 for (slot in 0 until inventory.size()) {
                     val stack = inventory.getStack(slot)
-                    if (stack.item == Items.ELYTRA) inventory.removeStack(slot)
-                    inventory.insertStack(ItemStack(SVOBUCKS).copyWithCount(5))
+                    if (stack.item == Items.ELYTRA) {
+                        inventory.removeStack(slot)
+                        inventory.insertStack(ItemStack(SVOBUCKS).copyWithCount(5))
+                    }
                 }
             }
         }

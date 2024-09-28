@@ -1,8 +1,11 @@
 {
   "itemGroup.pisskaland_overhaul:main_item_group": "PisskaLand Overhaul",
-  "block.pisskaland_overhaul.electrified_copper_block": "Наэлектризованный медный блок",
+  "block.pisskaland_overhaul.example_block": "Example block",
   "item.pisskaland_overhaul.wallet": "Кошель",
-  "item.pisskaland_overhaul.wallet_tooltip": "Количество монет",
+  "item.pisskaland_overhaul.wallet_tooltip_money_count": "Количество монет",
+  "command.pisskaland_overhaul.svobucks.give.fail": "Игрок \"{}\" не найден!",
+  "command.pisskaland_overhaul.svobucks.give.success": "СВОбаксы были успешно выданы",
+  "command.pisskaland_overhaul.svobucks.give.no_permission": "У вас недостаточно прав, чтобы использовать эту команду",
   "item.pisskaland_overhaul.svobucks": "СВОбакс",
   "item.pisskaland_overhaul.server_anthem_horn": "Гимн PisskaLand",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "Национальный гимн PisskaLand"

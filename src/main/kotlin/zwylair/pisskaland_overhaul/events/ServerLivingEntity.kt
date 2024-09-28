@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.item.ItemStack
+import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ServerLivingEntity {
@@ -18,6 +19,8 @@ object ServerLivingEntity {
     )
 
     fun register() {
+        PSO.LOGGER.info("Trying to register ServerLivingEntity events")
+
         ServerLivingEntityEvents.AFTER_DEATH.register(::dropCoin)
     }
 
