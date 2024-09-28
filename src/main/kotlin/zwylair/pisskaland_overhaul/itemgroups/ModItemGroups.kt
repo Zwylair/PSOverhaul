@@ -20,7 +20,7 @@ object ModItemGroups {
     fun init() {
         PSO_ITEMGROUP_ID = PSO.id("main_item_group")
         PSO_ITEMGROUP = FabricItemGroup.builder()
-            .icon { ItemStack(ModBlocks.ELECTRIFIED_COPPER_BLOCK) }
+            .icon { ItemStack(ModBlocks.EXAMPLE_BLOCK) }
             .displayName(Text.translatable("itemGroup.${PSO_ITEMGROUP_ID}"))
             .build()
 
