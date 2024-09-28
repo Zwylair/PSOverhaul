@@ -10,10 +10,10 @@ import zwylair.pisskaland_overhaul.ModObject.ModBlockItem
 import zwylair.pisskaland_overhaul.PSO
 
 object ModBlocks {
-    lateinit var ELECTRIFIED_COPPER_BLOCK: ModBlock
+    lateinit var EXAMPLE_BLOCK: ModBlock
 
     fun init() {
-        ELECTRIFIED_COPPER_BLOCK = register(ElectrifiedCopperBlock())
+        EXAMPLE_BLOCK = register(ExampleBlock())
     }
 
     private fun register(block: ModBlock): ModBlock {
