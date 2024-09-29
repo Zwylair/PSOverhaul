@@ -70,12 +70,12 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
 
         world?: return TypedActionResult.fail(itemStack)
 
-        PSO.LOGGER.info(
-            "WalletItem use():\n" +
-            "\tworld.isClient: ${world.isClient}\n" +
-            "\tmoneyAmount: ${getMoney()}\n" +
-            "\tplayer.nick: ${player.name.string}"
-        )
+//        PSO.LOGGER.info(
+//            "WalletItem use():\n" +
+//            "\tworld.isClient: ${world.isClient}\n" +
+//            "\tmoneyAmount: ${getMoney()}\n" +
+//            "\tplayer.nick: ${player.name.string}"
+//        )
 
         if (player.isSneaking && getMoney() >= 10) {
             if (world.isClient) {
