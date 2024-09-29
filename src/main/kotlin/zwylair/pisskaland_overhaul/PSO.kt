@@ -36,7 +36,8 @@ class PSO : ModInitializer {
         ServerLivingEntity.register()
         PlayerBlockBreak.register()
         ServerTick.register()
-        ModNetworking.register()
+        ModNetworking.registerServer()
+        ModConfig.loadConfig()
 
         LOGGER.info("")
         LOGGER.info("PisskaLandOverhaul has been initialized!")

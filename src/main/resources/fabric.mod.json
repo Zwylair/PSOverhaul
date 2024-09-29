@@ -19,6 +19,12 @@
 				"value": "zwylair.pisskaland_overhaul.PSO",
 				"adapter": "kotlin"
 			}
+		],
+		"client": [
+			{
+				"value": "zwylair.pisskaland_overhaul.PSOClient",
+				"adapter": "kotlin"
+			}
 		]
 	},
 	"depends": {
