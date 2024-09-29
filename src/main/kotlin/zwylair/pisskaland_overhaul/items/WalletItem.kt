@@ -13,7 +13,7 @@ import net.minecraft.world.World
 import net.minecraft.screen.slot.Slot
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import zwylair.pisskaland_overhaul.ModConfig
+//import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.ModObject.ModItem
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
