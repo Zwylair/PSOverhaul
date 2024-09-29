@@ -6,7 +6,7 @@
   "command.pisskaland_overhaul.svobucks.give.fail": "Player \"{}\" not found!",
   "command.pisskaland_overhaul.svobucks.give.no_permission": "You have not enough permission to use this command",
   "command.pisskaland_overhaul.svobucks.give.success": "SVObucks were successfully given",
-  "item.pisskaland_overhaul.svobucks": "SVObucks",
+  "item.pisskaland_overhaul.svobucks": "$SVO",
   "item.pisskaland_overhaul.server_anthem_horn": "PisskaLand Anthem",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem"
 }

@@ -2,12 +2,12 @@ package zwylair.pisskaland_overhaul
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.mojang.authlib.GameProfile
 import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
-import java.util.UUID
 
 object ModConfig {
     private val CONFIG_FILE = File("config/pso_storage.json")
@@ -42,13 +42,13 @@ object ModConfig {
         }
     }
 
-    fun updateMoneyData(playerUUID: UUID, moneyAmount: Int) {
-        moneyData.addProperty(playerUUID.toString(), moneyAmount)
+    fun updateMoneyAmount(playerGameProfile: GameProfile, moneyAmount: Int) {
+        moneyData.addProperty(playerGameProfile.id.toString(), moneyAmount)
         saveConfig()
     }
 
-    fun getPlayerMoneyAmount(playerUUID: UUID): Int {
-        var stringMoneyAmount = moneyData.get(playerUUID.toString())
+    fun getMoneyAmount(playerGameProfile: GameProfile): Int {
+        var stringMoneyAmount = moneyData.get(playerGameProfile.id.toString())
         return if (stringMoneyAmount == null) { 0 } else { stringMoneyAmount.asInt }
     }
 }
