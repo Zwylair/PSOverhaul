@@ -10,7 +10,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import zwylair.pisskaland_overhaul.PSO
-import zwylair.pisskaland_overhaul.blocks.ModBlocks
+import zwylair.pisskaland_overhaul.items.ModItems
 
 object ModItemGroups {
     lateinit var PSO_ITEMGROUP_ID: Identifier
@@ -20,7 +20,7 @@ object ModItemGroups {
     fun init() {
         PSO_ITEMGROUP_ID = PSO.id("main_item_group")
         PSO_ITEMGROUP = FabricItemGroup.builder()
-            .icon { ItemStack(ModBlocks.EXAMPLE_BLOCK) }
+            .icon { ItemStack(ModItems.SVOBUCKS) }
             .displayName(Text.translatable("itemGroup.${PSO_ITEMGROUP_ID}"))
             .build()
 

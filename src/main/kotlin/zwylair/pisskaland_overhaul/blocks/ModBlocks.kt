@@ -10,10 +10,7 @@ import zwylair.pisskaland_overhaul.ModObject.ModBlockItem
 import zwylair.pisskaland_overhaul.PSO
 
 object ModBlocks {
-    lateinit var EXAMPLE_BLOCK: ModBlock
-
     fun init() {
-        EXAMPLE_BLOCK = register(ExampleBlock())
     }
 
     private fun register(block: ModBlock): ModBlock {
