@@ -22,6 +22,7 @@ object ModNetworking {
     val GET_COINS = PSO.id("get_coins")
     val FETCH_PLAYER_MONEY_AMOUNT = PSO.id("fetch_player_money_amount")
     val CLEAR_SLOT_PACKET = PSO.id("clear_slot_packet")
+    val SEND_SERVER_MOD_VERSION_PACKET = PSO.id("send_server_mod_version")
     private val pendingCallbacks = ConcurrentHashMap<UUID, (Int) -> Unit>()
 
     fun registerServer() {
@@ -114,6 +115,23 @@ object ModNetworking {
                 }
             }
         }
+        ClientPlayNetworking.registerGlobalReceiver(SEND_SERVER_MOD_VERSION_PACKET) { client, handler, buf, responseSender ->
+            val serverModVersion = buf.readString()
+
+            PSO.LOGGER.info("[PSO Client] received SEND_SERVER_MOD_VERSION_PACKET")
+            PSO.LOGGER.info("[PSO Client] serverVersion: $serverModVersion; compatibleServerVersions: ${ModConfig.COMPATIBLE_SERVER_MOD_VERSIONS}")
+
+            client.execute {
+                if (!ModConfig.COMPATIBLE_SERVER_MOD_VERSIONS.contains(serverModVersion)) {
+                    handler.connection.disconnect(
+                        Text.translatable("pisskaland_overhaul.version_mismatched")
+                            .formatted(Formatting.BOLD)
+                            .formatted(Formatting.BLUE)
+                    )
+                    handler.connection.handleDisconnection()
+                }
+            }
+        }
     }
 
     fun sendIncrementMoneyPacket(
@@ -158,5 +176,12 @@ object ModNetworking {
         buf.writeInt(slotIndex)
 
         ClientPlayNetworking.send(CLEAR_SLOT_PACKET, buf)
+    }
+
+    fun sendServerVersionPacket(player: ServerPlayerEntity, serverModVersion: String) {
+        val buf = PacketByteBufs.create()
+        buf.writeString(serverModVersion)
+
+        ServerPlayNetworking.send(player, SEND_SERVER_MOD_VERSION_PACKET, buf)
     }
 }

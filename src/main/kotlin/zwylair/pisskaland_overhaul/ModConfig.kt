@@ -9,6 +9,10 @@ import java.io.FileWriter
 import java.io.IOException
 
 object ModConfig {
+    const val MOD_VERSION: String = "1.0.4"
+    val COMPATIBLE_SERVER_MOD_VERSIONS = listOf(
+        "1.0.4"
+    )
     private val CONFIG_FILE = File("config/pso_storage.json")
     private val gson = Gson()
     private var moneyData = JsonObject()

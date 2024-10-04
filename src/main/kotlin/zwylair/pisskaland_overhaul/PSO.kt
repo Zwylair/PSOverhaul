@@ -11,6 +11,7 @@ import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.commands.MoneyManage
 import zwylair.pisskaland_overhaul.events.PlayerBlockBreak
 import zwylair.pisskaland_overhaul.soundevents.ModSoundEvents
+import zwylair.pisskaland_overhaul.events.ServerPlayConnectionEvents
 import zwylair.pisskaland_overhaul.events.ServerLivingEntity
 import zwylair.pisskaland_overhaul.events.ServerTick
 import zwylair.pisskaland_overhaul.network.ModNetworking
@@ -33,6 +34,7 @@ class PSO : ModInitializer {
             MoneyManage.register(dispatcher)
         }
         LOGGER.info("")
+        ServerPlayConnectionEvents.register()
         ServerLivingEntity.register()
         PlayerBlockBreak.register()
         ServerTick.register()
