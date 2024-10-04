@@ -1,12 +1,16 @@
 {
   "itemGroup.pisskaland_overhaul:main_item_group": "PisskaLand Overhaul",
-  "block.pisskaland_overhaul.example_block": "Example block",
   "item.pisskaland_overhaul.wallet": "Wallet",
   "item.pisskaland_overhaul.wallet_tooltip_money_count": "Money count",
-  "command.pisskaland_overhaul.svobucks.give.fail": "Player \"{}\" not found!",
-  "command.pisskaland_overhaul.svobucks.give.no_permission": "You have not enough permission to use this command",
+  "command.pisskaland_overhaul.no_permission": "You have not enough permission to use this command",
   "command.pisskaland_overhaul.svobucks.give.success": "SVObucks were successfully given",
+  "command.pisskaland_overhaul.svobucks.erase.success": "SVObucks were successfully cleared from inventory",
+  "command.pisskaland_overhaul.wallet.increase.success": "Player's wallet was increased successfully",
+  "command.pisskaland_overhaul.wallet.reduce.success": "Player's wallet was reduced successfully",
+  "command.pisskaland_overhaul.wallet.reduce.fail": "There is less $SVO in player's wallet than you want to reduce!",
+  "command.pisskaland_overhaul.wallet.erase.success": "Player's wallet was erased successfully",
   "item.pisskaland_overhaul.svobucks": "$SVO",
   "item.pisskaland_overhaul.server_anthem_horn": "PisskaLand Anthem",
-  "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem"
+  "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem",
+  "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: The mod version does not match the server one"
 }

@@ -24,19 +24,38 @@ import zwylair.pisskaland_overhaul.network.ModNetworking
 class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     override var id = PSO.id("wallet")
     override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEMGROUP_REG_KEY
+    val fetchCoinsAmountTicksTimeout = 20
+    var fetchCoinsAmountTicksCounter = 0
 
     fun incrementMoneyCount(
         playerGameProfile: GameProfile,
-        amount: Int,
-        walletSlotIndex: Int,
-        nbt: NbtCompound
+        amount: Int
     ) {
-        ModNetworking.sendIncrementMoneyPacket(playerGameProfile, amount, walletSlotIndex, nbt)
+        ModNetworking.sendIncrementMoneyPacket(playerGameProfile, amount)
+    }
+
+    fun getEmptyNbt(): NbtCompound {
+        val nbt = NbtCompound()
+        nbt.putInt("moneyAmount", 0)
+
+        return nbt
+    }
+
+    fun updateMoneyNbt(player: PlayerEntity, itemStack: ItemStack) {
+        ModNetworking.sendFetchMoneyRequest(player) { moneyAmount ->
+            val nbt = if (itemStack.hasNbt()) { NbtCompound().copyFrom(itemStack.nbt!!) } else { getEmptyNbt() }
+            nbt.putInt("moneyAmount", moneyAmount)
+            PSO.LOGGER.info("WalletItem updateMoneyNbt(): moneyAmount: $moneyAmount; put nbt moneyAmount: ${nbt.getInt("moneyAmount")}")
+
+            itemStack.nbt = nbt
+            ModNetworking.sendUpdateItemStackNbtPacket(itemStack, nbt)
+        }
     }
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         if (stack.hasNbt() && stack.nbt?.contains("moneyAmount") == true) {
             val moneyAmount = stack.nbt!!.getInt("moneyAmount")
+            PSO.LOGGER.info("WalletItem appendTooltip(): moneyAmount -> $moneyAmount")
 
             tooltip.add(Text
                 .translatable("item.${PSO.MODID}.wallet_tooltip_money_count")
@@ -57,35 +76,22 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
         // arguments:
         //     stack: instance of WalletItem
         //     slot: Slot that contains clicked item
-        // returns:
-        //     true: event was handled, any changes will be saved
-        //     false: event was not handled, minecraft will try to revert any changes
 
         if (clickType == ClickType.LEFT) { return false }
-        if (!slot.stack.translationKey.contains("${PSO.MODID}.svobucks")) { return false }
+        if (!slot.stack.translationKey.contains("${PSO.MODID}.svobucks")) { return true }
 
-        if (!stack.hasNbt()) {
-            stack.nbt = NbtCompound()
-            stack.nbt!!.putInt("moneyAmount", 0)
-        }
-
-        stack.nbt!!.putInt("moneyAmount", stack.nbt!!.getInt("moneyAmount") + slot.stack.count)
-        incrementMoneyCount(player.gameProfile, slot.stack.count, slot.index, stack.nbt!!)
+        incrementMoneyCount(player.gameProfile, slot.stack.count)
         ModNetworking.sendClearSlotPacket(player.gameProfile, slot.index)
-        player.inventory.removeStack(slot.index)
-        slot.inventory.markDirty()
-
         return true
     }
 
     override fun inventoryTick(itemStack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
         if (!world.isClient) { return }
-        if (itemStack.hasNbt() && itemStack.nbt?.contains("moneyAmount") == true) { return }
+        fetchCoinsAmountTicksCounter++
 
-        ModNetworking.sendFetchMoneyRequest(entity as PlayerEntity) { moneyAmount ->
-            itemStack.nbt = NbtCompound()
-            itemStack.nbt!!.putInt("moneyAmount", moneyAmount)
-            entity.inventory.markDirty()
+        if (fetchCoinsAmountTicksCounter >= fetchCoinsAmountTicksTimeout) {
+            updateMoneyNbt(entity as PlayerEntity, itemStack)
+            fetchCoinsAmountTicksCounter = 0
         }
     }
 
@@ -101,12 +107,14 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
         ModNetworking.sendFetchMoneyRequest(player) { moneyAmount ->
             if (player.isSneaking && moneyAmount >= 10) {
                 itemStack.nbt!!.putInt("moneyAmount", moneyAmount - 10)
-                incrementMoneyCount(player.gameProfile, -10, player.inventory.getSlotWithStack(player.getStackInHand(hand)), itemStack.nbt!!)
+                incrementMoneyCount(player.gameProfile, -10)
                 ModNetworking.sendGetCoinsPacket(player.gameProfile, 10)
+                updateMoneyNbt(player, itemStack)
             } else if (moneyAmount >= 1) {
                 itemStack.nbt!!.putInt("moneyAmount", moneyAmount - 1)
-                incrementMoneyCount(player.gameProfile, -1, player.inventory.getSlotWithStack(player.getStackInHand(hand)), itemStack.nbt!!)
+                incrementMoneyCount(player.gameProfile, -1)
                 ModNetworking.sendGetCoinsPacket(player.gameProfile, 1)
+                updateMoneyNbt(player, itemStack)
             }
         }
 

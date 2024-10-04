@@ -1,5 +1,7 @@
 package zwylair.pisskaland_overhaul.network
 
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import com.mojang.authlib.GameProfile
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -7,49 +9,51 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 
 object ModNetworking {
     val INCREMENT_WALLET_MONEY = PSO.id("increment_wallet_money")
+    val UPDATE_ITEMSTACK_NBT = PSO.id("update_itemstack_nbt")
     val GET_COINS = PSO.id("get_coins")
     val FETCH_PLAYER_MONEY_AMOUNT = PSO.id("fetch_player_money_amount")
     val CLEAR_SLOT_PACKET = PSO.id("clear_slot_packet")
-    val VERIFY_SERVER_MOD_VERSION_PACKET = PSO.id("verify_server_mod_version_packet")
     private val pendingCallbacks = ConcurrentHashMap<UUID, (Int) -> Unit>()
 
     fun registerServer() {
         PSO.LOGGER.info("Trying to register server networking module")
 
         ServerPlayNetworking.registerGlobalReceiver(INCREMENT_WALLET_MONEY) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("INCREMENT_WALLET_MONEY")
+            PSO.LOGGER.info("[PSO] received INCREMENT_WALLET_MONEY")
 
             val playerGameProfile = buf.readGameProfile()
             val amount = buf.readInt()
-            val walletSlotIndex = buf.readInt()
-            val nbt = buf.readNbt()
-
-            PSO.LOGGER.info(
-                "\tamount: $amount;\n" +
-                "\twalletSlotIndex: $walletSlotIndex;\n" +
-                "\tname: ${player.inventory.getStack(walletSlotIndex).name.string}"
-            )
 
             server.execute {
                 ModConfig.updateMoneyAmount(
                     playerGameProfile,
                     ModConfig.getMoneyAmount(playerGameProfile) + amount
                 )
+            }
+        }
+        ServerPlayNetworking.registerGlobalReceiver(UPDATE_ITEMSTACK_NBT) { server, player, handler, buf, responseSender ->
+            PSO.LOGGER.info("[PSO] received UPDATE_ITEMSTACK_NBT")
 
-                player.inventory.getStack(walletSlotIndex).nbt = nbt
-                player.inventory.markDirty()
+            val itemStack = buf.readItemStack()
+            val nbt = buf.readNbt()
+
+            server.execute {
+                itemStack.nbt = nbt
+//                player.inventory.markDirty()
+                PSO.LOGGER.info("[PSO] itemStack nbt: ${itemStack.nbt?.getInt("moneyAmount")}")
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(GET_COINS) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("GET_COINS")
+            PSO.LOGGER.info("[PSO] received GET_COINS")
             val playerGameProfile = buf.readGameProfile()
             val amount = buf.readInt()
 
@@ -64,7 +68,7 @@ object ModNetworking {
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(CLEAR_SLOT_PACKET) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("CLEAR_SLOT_PACKET")
+            PSO.LOGGER.info("[PSO] received CLEAR_SLOT_PACKET")
 
             val playerGameProfile = buf.readGameProfile()
             val slotIndex = buf.readInt()
@@ -72,13 +76,14 @@ object ModNetworking {
                 server.playerManager.playerList.forEach {
                     if (it.gameProfile == playerGameProfile) {
                         it.inventory.removeStack(slotIndex)
+                        it.inventory.markDirty()
                         return@execute
                     }
                 }
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(FETCH_PLAYER_MONEY_AMOUNT) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("SERVER FETCH_PLAYER_MONEY_AMOUNT")
+            PSO.LOGGER.info("[PSO] received FETCH_PLAYER_MONEY_AMOUNT")
             val playerGameProfile = buf.readGameProfile()
 
             server.execute {
@@ -86,10 +91,8 @@ object ModNetworking {
 
                 if (targetPlayer != null) {
                     val moneyAmount = ModConfig.getMoneyAmount(targetPlayer.gameProfile)
-
                     val responseBuf = PacketByteBufs.create()
                     responseBuf.writeInt(moneyAmount)
-
                     ServerPlayNetworking.send(targetPlayer, FETCH_PLAYER_MONEY_AMOUNT, responseBuf)
                 }
             }
@@ -100,7 +103,7 @@ object ModNetworking {
         PSO.LOGGER.info("Trying to register client networking module")
 
         ClientPlayNetworking.registerGlobalReceiver(FETCH_PLAYER_MONEY_AMOUNT) { client, handler, buf, responseSender ->
-            PSO.LOGGER.info("CLIENT FETCH_PLAYER_MONEY_AMOUNT")
+            PSO.LOGGER.info("[PSO Client] received FETCH_PLAYER_MONEY_AMOUNT")
             val moneyAmount = buf.readInt()
             val playerUUID = client.player?.gameProfile?.id
 
@@ -115,15 +118,11 @@ object ModNetworking {
 
     fun sendIncrementMoneyPacket(
         playerGameProfile: GameProfile,
-        amount: Int,
-        walletSlotIndex: Int,
-        nbt: NbtCompound
+        amount: Int
     ) {
         val buf = PacketByteBufs.create()
         buf.writeGameProfile(playerGameProfile)
         buf.writeInt(amount)
-        buf.writeInt(walletSlotIndex)
-        buf.writeNbt(nbt)
 
         ClientPlayNetworking.send(INCREMENT_WALLET_MONEY, buf)
     }
@@ -134,6 +133,14 @@ object ModNetworking {
         buf.writeInt(amount)
 
         ClientPlayNetworking.send(GET_COINS, buf)
+    }
+
+    fun sendUpdateItemStackNbtPacket(itemStack: ItemStack, nbt: NbtCompound) {
+        val buf = PacketByteBufs.create()
+        buf.writeItemStack(itemStack)
+        buf.writeNbt(nbt)
+
+        ClientPlayNetworking.send(UPDATE_ITEMSTACK_NBT, buf)
     }
 
     fun sendFetchMoneyRequest(player: PlayerEntity, callback: (Int) -> Unit) {

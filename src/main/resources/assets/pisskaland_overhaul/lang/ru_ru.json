@@ -1,11 +1,14 @@
 {
   "itemGroup.pisskaland_overhaul:main_item_group": "PisskaLand Overhaul",
-  "block.pisskaland_overhaul.example_block": "Example block",
   "item.pisskaland_overhaul.wallet": "Кошель",
   "item.pisskaland_overhaul.wallet_tooltip_money_count": "Количество монет",
-  "command.pisskaland_overhaul.svobucks.give.fail": "Игрок \"{}\" не найден!",
+  "command.pisskaland_overhaul.no_permission": "У вас недостаточно прав, чтобы использовать эту команду",
   "command.pisskaland_overhaul.svobucks.give.success": "СВОбаксы были успешно выданы",
-  "command.pisskaland_overhaul.svobucks.give.no_permission": "У вас недостаточно прав, чтобы использовать эту команду",
+  "command.pisskaland_overhaul.svobucks.erase.success": "СВОбаксы былы успешно очищены с инвентаря",
+  "command.pisskaland_overhaul.wallet.increase.success": "Кошель игрока был успешно увеличен",
+  "command.pisskaland_overhaul.wallet.reduce.success": "Кошель игрока был успешно уменьшен",
+  "command.pisskaland_overhaul.wallet.reduce.fail": "В кошеле игрока меньше $SVO, чем вы хотите уменьшить!",
+  "command.pisskaland_overhaul.wallet.erase.success": "Кошелек игрока был успешно очищен",
   "item.pisskaland_overhaul.svobucks": "$SVO",
   "item.pisskaland_overhaul.server_anthem_horn": "Гимн PisskaLand",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "Национальный гимн PisskaLand"

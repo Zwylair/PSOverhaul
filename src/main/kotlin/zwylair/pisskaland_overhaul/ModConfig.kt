@@ -3,7 +3,6 @@ package zwylair.pisskaland_overhaul
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.mojang.authlib.GameProfile
-import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -28,7 +27,7 @@ object ModConfig {
     }
 
     fun loadConfig() {
-        LOGGER.info("Loading config")
+        PSO.LOGGER.info("Loading config")
 
         if (CONFIG_FILE.exists()) {
             try {
