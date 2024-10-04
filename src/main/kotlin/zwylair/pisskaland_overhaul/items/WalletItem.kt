@@ -55,7 +55,6 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         if (stack.hasNbt() && stack.nbt?.contains("moneyAmount") == true) {
             val moneyAmount = stack.nbt!!.getInt("moneyAmount")
-            PSO.LOGGER.info("WalletItem appendTooltip(): moneyAmount -> $moneyAmount")
 
             tooltip.add(Text
                 .translatable("item.${PSO.MODID}.wallet_tooltip_money_count")
@@ -81,6 +80,7 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
         if (!slot.stack.translationKey.contains("${PSO.MODID}.svobucks")) { return true }
 
         incrementMoneyCount(player.gameProfile, slot.stack.count)
+        player.inventory.removeStack(slot.index)
         ModNetworking.sendClearSlotPacket(player.gameProfile, slot.index)
         return true
     }
