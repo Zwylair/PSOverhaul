@@ -12,10 +12,11 @@ import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ServerLivingEntity {
-    val bossCoinDropChance = mapOf(
+    val mobCoinDropChance = mapOf(
         EntityType.WITHER to listOf(7, 13),
         EntityType.ELDER_GUARDIAN to listOf(20, 25),
-        EntityType.WARDEN to listOf(20, 30)
+        EntityType.WARDEN to listOf(20, 30),
+        EntityType.BAT to listOf(1, 1)
     )
 
     fun register() {
@@ -34,7 +35,7 @@ object ServerLivingEntity {
         damageSource.source?: return
         if (!damageSource.source!!.isPlayer) return
 
-        bossCoinDropChance.forEach {
+        mobCoinDropChance.forEach {
             val (entityType, coinAmount) = it
             if (entity.type == entityType) { spawnItem(entity, Random.nextInt(coinAmount[0], coinAmount[1])) }
         }
