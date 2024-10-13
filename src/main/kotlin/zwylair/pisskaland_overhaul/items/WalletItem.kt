@@ -70,12 +70,13 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     }
 
     override fun onStackClicked(stack: ItemStack, slot: Slot, clickType: ClickType, player: PlayerEntity): Boolean {
-        // client-side event
+        // client-side event?
         // arguments:
         //     stack: instance of WalletItem
         //     slot: Slot that contains clicked item
 
         if (clickType == ClickType.LEFT) { return false }
+        if (!player.world.isClient) { return false }
         if (!slot.stack.translationKey.contains("${PSO.MODID}.svobucks")) { return true }
 
         incrementMoneyCount(player.gameProfile, slot.stack.count)
