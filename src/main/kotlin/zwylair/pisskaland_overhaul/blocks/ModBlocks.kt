@@ -10,7 +10,10 @@ import zwylair.pisskaland_overhaul.ModObject.ModBlockItem
 import zwylair.pisskaland_overhaul.PSO
 
 object ModBlocks {
+    lateinit var ALTAR_GLASS: ModBlock
+
     fun init() {
+        ALTAR_GLASS = register(AltarGlass())
     }
 
     private fun register(block: ModBlock): ModBlock {

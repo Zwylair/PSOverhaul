@@ -12,5 +12,6 @@
   "item.pisskaland_overhaul.svobucks": "$SVO",
   "item.pisskaland_overhaul.server_anthem_horn": "PisskaLand Anthem",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem",
-  "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: The mod version does not match the server one"
+  "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: The mod version does not match the server one",
+  "block.pisskaland_overhaul.altar_glass": "Altar Glass"
 }
