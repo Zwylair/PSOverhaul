@@ -9,9 +9,9 @@ import java.io.FileWriter
 import java.io.IOException
 
 object ModConfig {
-    const val MOD_VERSION: String = "1.0.4"
+    const val MOD_VERSION: String = "1.1.0"
     val COMPATIBLE_SERVER_MOD_VERSIONS = listOf(
-        "1.0.4"
+        MOD_VERSION,
     )
     private val CONFIG_FILE = File("config/pso_storage.json")
     private val gson = Gson()
@@ -21,13 +21,8 @@ object ModConfig {
         val json = JsonObject()
         json.add("moneyData", moneyData)
 
-        try {
-            FileWriter(CONFIG_FILE).use { writer ->
-                gson.toJson(json, writer)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+        try { FileWriter(CONFIG_FILE).use { writer -> gson.toJson(json, writer) } }
+        catch (e: IOException) { e.printStackTrace() }
     }
 
     fun loadConfig() {
@@ -39,19 +34,28 @@ object ModConfig {
                     val json = gson.fromJson(reader, JsonObject::class.java)
                     moneyData = json.getAsJsonObject("moneyData")
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            } catch (e: IOException) { e.printStackTrace() }
         }
     }
 
     fun updateMoneyAmount(playerGameProfile: GameProfile, moneyAmount: Int) {
-        moneyData.addProperty(playerGameProfile.id.toString(), moneyAmount)
+        moneyData.addProperty(playerGameProfile.name.toString(), moneyAmount)
         saveConfig()
     }
 
     fun getMoneyAmount(playerGameProfile: GameProfile): Int {
-        var stringMoneyAmount = moneyData.get(playerGameProfile.id.toString())
-        return if (stringMoneyAmount == null) { 0 } else { stringMoneyAmount.asInt }
+        var stringMoneyAmount = moneyData.get(playerGameProfile.name.toString())
+        var stringMoneyAmountByUUID = moneyData.get(playerGameProfile.id.toString())
+
+        // code that converts the save key from uuid to player nickname
+        if (stringMoneyAmount == null) {
+            val moneyAmount = if (stringMoneyAmountByUUID == null) 0 else stringMoneyAmountByUUID.asInt
+
+            moneyData.remove(playerGameProfile.id.toString())
+            updateMoneyAmount(playerGameProfile, moneyAmount)
+            stringMoneyAmount = stringMoneyAmountByUUID
+        }
+
+        return if (stringMoneyAmount == null) 0 else stringMoneyAmount.asInt
     }
 }
