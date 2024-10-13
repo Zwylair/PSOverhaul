@@ -29,7 +29,7 @@ object ModNetworking {
         PSO.LOGGER.info("Trying to register server networking module")
 
         ServerPlayNetworking.registerGlobalReceiver(INCREMENT_WALLET_MONEY) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO] received INCREMENT_WALLET_MONEY")
+//            PSO.LOGGER.info("[PSO] received INCREMENT_WALLET_MONEY")
 
             val playerGameProfile = buf.readGameProfile()
             val amount = buf.readInt()
@@ -42,7 +42,7 @@ object ModNetworking {
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(UPDATE_ITEMSTACK_NBT) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO] received UPDATE_ITEMSTACK_NBT")
+//            PSO.LOGGER.info("[PSO] received UPDATE_ITEMSTACK_NBT")
 
             val itemStack = buf.readItemStack()
             val nbt = buf.readNbt()
@@ -50,11 +50,11 @@ object ModNetworking {
             server.execute {
                 itemStack.nbt = nbt
 //                player.inventory.markDirty()
-                PSO.LOGGER.info("[PSO] itemStack nbt: ${itemStack.nbt?.getInt("moneyAmount")}")
+//                PSO.LOGGER.info("[PSO] itemStack nbt: ${itemStack.nbt?.getInt("moneyAmount")}")
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(GET_COINS) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO] received GET_COINS")
+//            PSO.LOGGER.info("[PSO] received GET_COINS")
             val playerGameProfile = buf.readGameProfile()
             val amount = buf.readInt()
 
@@ -69,7 +69,7 @@ object ModNetworking {
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(CLEAR_SLOT_PACKET) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO] received CLEAR_SLOT_PACKET")
+//            PSO.LOGGER.info("[PSO] received CLEAR_SLOT_PACKET")
 
             val playerGameProfile = buf.readGameProfile()
             val slotIndex = buf.readInt()
@@ -84,7 +84,7 @@ object ModNetworking {
             }
         }
         ServerPlayNetworking.registerGlobalReceiver(FETCH_PLAYER_MONEY_AMOUNT) { server, player, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO] received FETCH_PLAYER_MONEY_AMOUNT")
+//            PSO.LOGGER.info("[PSO] received FETCH_PLAYER_MONEY_AMOUNT")
             val playerGameProfile = buf.readGameProfile()
 
             server.execute {
@@ -104,7 +104,7 @@ object ModNetworking {
         PSO.LOGGER.info("Trying to register client networking module")
 
         ClientPlayNetworking.registerGlobalReceiver(FETCH_PLAYER_MONEY_AMOUNT) { client, handler, buf, responseSender ->
-            PSO.LOGGER.info("[PSO Client] received FETCH_PLAYER_MONEY_AMOUNT")
+//            PSO.LOGGER.info("[PSO Client] received FETCH_PLAYER_MONEY_AMOUNT")
             val moneyAmount = buf.readInt()
             val playerUUID = client.player?.gameProfile?.id
 
@@ -118,8 +118,8 @@ object ModNetworking {
         ClientPlayNetworking.registerGlobalReceiver(SEND_SERVER_MOD_VERSION_PACKET) { client, handler, buf, responseSender ->
             val serverModVersion = buf.readString()
 
-            PSO.LOGGER.info("[PSO Client] received SEND_SERVER_MOD_VERSION_PACKET")
-            PSO.LOGGER.info("[PSO Client] serverVersion: $serverModVersion; compatibleServerVersions: ${ModConfig.COMPATIBLE_SERVER_MOD_VERSIONS}")
+//            PSO.LOGGER.info("[PSO Client] received SEND_SERVER_MOD_VERSION_PACKET")
+//            PSO.LOGGER.info("[PSO Client] serverVersion: $serverModVersion; compatibleServerVersions: ${ModConfig.COMPATIBLE_SERVER_MOD_VERSIONS}")
 
             client.execute {
                 if (!ModConfig.COMPATIBLE_SERVER_MOD_VERSIONS.contains(serverModVersion)) {

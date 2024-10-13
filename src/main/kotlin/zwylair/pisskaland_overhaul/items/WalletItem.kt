@@ -37,7 +37,6 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     fun getEmptyNbt(): NbtCompound {
         val nbt = NbtCompound()
         nbt.putInt("moneyAmount", 0)
-
         return nbt
     }
 
@@ -45,7 +44,7 @@ class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
         ModNetworking.sendFetchMoneyRequest(player) { moneyAmount ->
             val nbt = if (itemStack.hasNbt()) { NbtCompound().copyFrom(itemStack.nbt!!) } else { getEmptyNbt() }
             nbt.putInt("moneyAmount", moneyAmount)
-            PSO.LOGGER.info("WalletItem updateMoneyNbt(): moneyAmount: $moneyAmount; put nbt moneyAmount: ${nbt.getInt("moneyAmount")}")
+//            PSO.LOGGER.info("WalletItem updateMoneyNbt(): moneyAmount: $moneyAmount; put nbt moneyAmount: ${nbt.getInt("moneyAmount")}")
 
             itemStack.nbt = nbt
             ModNetworking.sendUpdateItemStackNbtPacket(itemStack, nbt)
