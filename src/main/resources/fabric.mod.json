@@ -10,7 +10,7 @@
 	"contact": {
 		"sources": "https://github.com/Zwylair/PisskaLandOverhaul"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/pisskaland_overhaul/icon.png",
 	"environment": "*",
 	"entrypoints": {
