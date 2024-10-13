@@ -33,7 +33,6 @@ class PSO : ModInitializer {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             MoneyManage.register(dispatcher)
         }
-        LOGGER.info("")
         ServerPlayConnectionEvents.register()
         ServerLivingEntity.register()
         PlayerBlockBreak.register()
@@ -41,8 +40,6 @@ class PSO : ModInitializer {
         ModNetworking.registerServer()
         ModConfig.loadConfig()
 
-        LOGGER.info("")
         LOGGER.info("PisskaLandOverhaul has been initialized!")
-        LOGGER.info("")
     }
 }

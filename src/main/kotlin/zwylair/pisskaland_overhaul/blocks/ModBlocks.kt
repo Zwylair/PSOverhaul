@@ -21,7 +21,6 @@ object ModBlocks {
 
         Registry.register(Registries.BLOCK, block.id, block)
         Registry.register(Registries.ITEM, block.id, blockItem)
-        PSO.LOGGER.info("")
         PSO.LOGGER.info("{} Block, BlockItem registered", block.translationKey)
         if (block.itemGroupAddTo != null) addToGroup(blockItem)
 

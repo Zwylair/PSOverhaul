@@ -24,27 +24,30 @@ object ModItems {
 
     private fun register(item: ModItem): ModItem {
         Registry.register(Registries.ITEM, item.id, item)
-        PSO.LOGGER.info("")
-        PSO.LOGGER.info("{} Item registered", item.translationKey)
+        logItemRegistration(item)
         if (item.itemGroupAddTo != null) addToGroup(item)
         return item
     }
 
     private fun register(item: Item, itemId: Identifier, itemGroupAddTo: RegistryKey<ItemGroup>?): Item {
         Registry.register(Registries.ITEM, itemId, item)
-        PSO.LOGGER.info("")
-        PSO.LOGGER.info("{} Item registered", item.translationKey)
+        logItemRegistration(item)
         if (itemGroupAddTo != null) addToGroup(item, itemGroupAddTo)
         return item
     }
 
     private fun addToGroup(item: ModItem) {
         ItemGroupEvents.modifyEntriesEvent(item.itemGroupAddTo).register(ItemGroupEvents.ModifyEntries { it.add(item) })
-        PSO.LOGGER.info("{} Item added into {} ItemGroup", item.translationKey, item.itemGroupAddTo?.value?.toTranslationKey())
+        logGroupAdding(item, item.itemGroupAddTo)
     }
 
     private fun addToGroup(item: Item, itemGroupAddTo: RegistryKey<ItemGroup>) {
         ItemGroupEvents.modifyEntriesEvent(itemGroupAddTo).register(ItemGroupEvents.ModifyEntries { it.add(item) })
-        PSO.LOGGER.info("{} Item added into {} ItemGroup", item.translationKey, itemGroupAddTo.value?.toTranslationKey())
+        logGroupAdding(item, itemGroupAddTo)
+    }
+
+    private fun logItemRegistration(item: Item) { PSO.LOGGER.info("{} registered", item.translationKey) }
+    private fun logGroupAdding(item: Item, itemGroupRegKey: RegistryKey<ItemGroup>?) {
+        PSO.LOGGER.info("{} added to {} ItemGroup", item.translationKey, itemGroupRegKey?.value?.toTranslationKey())
     }
 }

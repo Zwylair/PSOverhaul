@@ -31,7 +31,6 @@ object ModItemGroups {
 
     private fun register(itemGroup: ItemGroup, id: Identifier) {
         Registry.register(Registries.ITEM_GROUP, id, itemGroup)
-        PSO.LOGGER.info("")
         PSO.LOGGER.info("{} ItemGroup registered", id.toTranslationKey())
     }
 }

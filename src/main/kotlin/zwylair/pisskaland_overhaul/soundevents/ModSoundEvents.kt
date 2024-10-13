@@ -17,7 +17,6 @@ object ModSoundEvents {
 
     private fun register(identifier: Identifier): SoundEvent {
         val soundEvent = Registry.register(Registries.SOUND_EVENT, identifier, SoundEvent.of(identifier))
-        PSO.LOGGER.info("")
         PSO.LOGGER.info("{} SoundEvent registered", identifier.toTranslationKey())
         return soundEvent
     }
