@@ -14,6 +14,9 @@
 	"icon": "assets/pisskaland_overhaul/icon.png",
 	"environment": "*",
 	"entrypoints": {
+		"fabric-datagen": [
+			"zwylair.pisskaland_overhaul.PSODataGenerator"
+		],
 		"main": [
 			{
 				"value": "zwylair.pisskaland_overhaul.PSO",

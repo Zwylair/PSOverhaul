@@ -13,5 +13,7 @@
   "item.pisskaland_overhaul.server_anthem_horn": "PisskaLand Anthem",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "PisskaLand National Anthem",
   "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: The mod version does not match the server one",
-  "block.pisskaland_overhaul.altar_glass": "Altar Glass"
+  "block.pisskaland_overhaul.altar_glass": "Altar Glass",
+  "advancement.pisskaland_overhaul.make_altar.title": "Do you believe in God?",
+  "advancement.pisskaland_overhaul.make_altar.description": "Build and complete the altar"
 }

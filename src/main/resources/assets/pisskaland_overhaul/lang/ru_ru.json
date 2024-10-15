@@ -13,5 +13,7 @@
   "item.pisskaland_overhaul.server_anthem_horn": "Гимн PisskaLand",
   "item.pisskaland_overhaul.server_anthem_horn_tooltip": "Национальный гимн PisskaLand",
   "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: Версия мода не совпадает с серверной",
-  "block.pisskaland_overhaul.altar_glass": "Стекло алтаря"
+  "block.pisskaland_overhaul.altar_glass": "Стекло алтаря",
+  "advancement.pisskaland_overhaul.make_altar.title": "А вы верите в бога?",
+  "advancement.pisskaland_overhaul.make_altar.description": "Создайте и завершите алтарь"
 }
