@@ -126,7 +126,10 @@ object MoneyManage {
         }
 
         if (playerGiveTo == null) {
-            executorPlayer.inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS).copyWithCount(amount))
+            MoneyConfig.updateMoneyAmount(
+                executorPlayer.gameProfile,
+                MoneyConfig.getMoneyAmount(executorPlayer.gameProfile) + amount
+            )
             ctx.source.sendFeedback(
                 { Text.translatable("command.${PSO.MODID}.wallet.increase.success").formatted(Formatting.GRAY) },
                 false
