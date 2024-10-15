@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.world.World
+import net.minecraft.server.world.ServerWorld
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
@@ -14,15 +14,19 @@ object ServerTick {
     )
 
     const val CHECK_FOR_FORBIDDEN_ITEMS_TIMEOUT = 1 * 20
-    var checkForForbiddenItemsTimeoutCount = 1 * 20
+    var checkForForbiddenItemsTimeoutCount = 0
+    const val CHECK_FOR_PRAY_TIMEOUT = 3 * 20
+    var checkForPrayCount = 0
+    var notFinishedDayTicks = (-1).toLong()
 
     fun register() {
         PSO.LOGGER.info("Trying to register ServerTick events")
 
         ServerTickEvents.END_WORLD_TICK.register(::checkForForbiddenItems)
+        ServerTickEvents.END_WORLD_TICK.register(::prayerCheck)
     }
 
-    private fun checkForForbiddenItems(world: World) {
+    private fun checkForForbiddenItems(world: ServerWorld) {
         if (checkForForbiddenItemsTimeoutCount < CHECK_FOR_FORBIDDEN_ITEMS_TIMEOUT) {
             checkForForbiddenItemsTimeoutCount += 1
             return
@@ -45,5 +49,22 @@ object ServerTick {
                 }
             }
         }
+    }
+
+    private fun prayerCheck(world: ServerWorld) {
+        if (checkForPrayCount < CHECK_FOR_PRAY_TIMEOUT) {
+            checkForPrayCount += 1
+            return
+        } else { checkForPrayCount = 0 }
+
+        val localNotFinishedDayTicks = world.timeOfDay % 24000
+
+        if (localNotFinishedDayTicks > notFinishedDayTicks) {
+            notFinishedDayTicks = localNotFinishedDayTicks
+            return
+        }
+
+        notFinishedDayTicks = -1
+        PSO.LOGGER.info("new day handled")
     }
 }
