@@ -6,23 +6,23 @@ import zwylair.pisskaland_overhaul.config.Config.saveConfig
 
 object MoneyConfig {
     fun updateMoneyAmount(playerGameProfile: GameProfile, moneyAmount: Int) {
-        moneyData.addProperty(playerGameProfile.name.toString(), moneyAmount)
+        moneyData.addProperty(playerGameProfile.name, moneyAmount)
         saveConfig()
     }
 
     fun getMoneyAmount(playerGameProfile: GameProfile): Int {
-        var stringMoneyAmount = moneyData.get(playerGameProfile.name.toString())
+        var stringMoneyAmount = moneyData.get(playerGameProfile.name)
         var stringMoneyAmountByUUID = moneyData.get(playerGameProfile.id.toString())
 
         // code that converts the save key from uuid to player nickname
         if (stringMoneyAmount == null) {
-            val moneyAmount = if (stringMoneyAmountByUUID == null) 0 else stringMoneyAmountByUUID.asInt
+            val moneyAmount = stringMoneyAmountByUUID?.asInt?: 0
 
             moneyData.remove(playerGameProfile.id.toString())
             updateMoneyAmount(playerGameProfile, moneyAmount)
             stringMoneyAmount = stringMoneyAmountByUUID
         }
 
-        return if (stringMoneyAmount == null) 0 else stringMoneyAmount.asInt
+        return stringMoneyAmount?.asInt?: 0
     }
 }
