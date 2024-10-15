@@ -9,22 +9,26 @@ import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ServerTick {
-    const val CHECK_FOR_ELYTRA_TIMEOUT_IN_TICKS = 1 * 20
-    var checkForElytraTimeoutCount = 1 * 20
+    private val forbiddenItems = mapOf(
+        Items.ELYTRA.translationKey to 20
+    )
+
+    const val CHECK_FOR_FORBIDDEN_ITEMS_TIMEOUT = 1 * 20
+    var checkForForbiddenItemsTimeoutCount = 1 * 20
 
     fun register() {
         PSO.LOGGER.info("Trying to register ServerTick events")
 
-        ServerTickEvents.END_WORLD_TICK.register(::checkAndRemoveElytra)
+        ServerTickEvents.END_WORLD_TICK.register(::checkForForbiddenItems)
     }
 
-    private fun checkAndRemoveElytra(world: World) {
-        if (checkForElytraTimeoutCount < CHECK_FOR_ELYTRA_TIMEOUT_IN_TICKS) {
-            checkForElytraTimeoutCount += 1
+    private fun checkForForbiddenItems(world: World) {
+        if (checkForForbiddenItemsTimeoutCount < CHECK_FOR_FORBIDDEN_ITEMS_TIMEOUT) {
+            checkForForbiddenItemsTimeoutCount += 1
             return
         }
 
-        checkForElytraTimeoutCount = 0
+        checkForForbiddenItemsTimeoutCount = 0
 
         world.players.forEach {
             if (it is ServerPlayerEntity) {
@@ -32,9 +36,11 @@ object ServerTick {
 
                 for (slot in 0 until inventory.size()) {
                     val stack = inventory.getStack(slot)
-                    if (stack.item == Items.ELYTRA) {
+                    val itemTranslationKey = stack.item.translationKey
+
+                    if (itemTranslationKey in forbiddenItems.keys) {
                         inventory.removeStack(slot)
-                        inventory.insertStack(ItemStack(SVOBUCKS).copyWithCount(5))
+                        inventory.insertStack(ItemStack(SVOBUCKS).copyWithCount(forbiddenItems[itemTranslationKey]!!))
                     }
                 }
             }
