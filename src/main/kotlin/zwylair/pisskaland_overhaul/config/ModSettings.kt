@@ -7,6 +7,5 @@ object ModSettings {
     val COMPATIBLE_SERVER_MOD_VERSIONS = listOf(
         MOD_VERSION,
     )
-    const val MAX_DAYS_WITHOUT_PRAYING = 7
     val CONFIG_FILE = File("config/pso_storage.json")
 }

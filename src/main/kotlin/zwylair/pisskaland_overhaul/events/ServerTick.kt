@@ -10,7 +10,6 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import zwylair.pisskaland_overhaul.PSO
-import zwylair.pisskaland_overhaul.config.ModSettings
 import zwylair.pisskaland_overhaul.config.PrayConfig
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
@@ -75,9 +74,33 @@ object ServerTick {
         world.server.playerManager.playerList.forEach {
             if (PrayConfig.didPlayerPray(it.gameProfile)) {
                 PrayConfig.setPlayerNotPrayedCount(it.gameProfile, 0)
+                val prayStreak = PrayConfig.incrementPlayerPrayStreak(it.gameProfile)
+
+                if (
+                    prayStreak >= PrayConfig.DAYS_TO_BECOME_A_DEVOUT &&
+                    !PrayConfig.isPlayerDevout(it.gameProfile)
+                ) {
+                    PrayConfig.makePlayerDevout(it.gameProfile)
+                    it.sendMessage(
+                        Text
+                            .translatable("${PSO.MODID}.pray.became_a_devout")
+                            .formatted(Formatting.DARK_AQUA)
+                    )
+                }
             } else {
+                PrayConfig.resetPlayerPrayStreak(it.gameProfile)
+                if (!PrayConfig.isPlayerDevout(it.gameProfile)) {
+                    return
+                }
+
+                it.sendMessage(
+                    Text
+                        .translatable("${PSO.MODID}.pray.pray_streak_was_zeroed")
+                        .formatted(Formatting.DARK_GRAY)
+                )
+
                 val notPrayedDays = PrayConfig.increasePlayerNotPrayedCount(it.gameProfile)
-                if (notPrayedDays >= ModSettings.MAX_DAYS_WITHOUT_PRAYING) {
+                if (notPrayedDays >= PrayConfig.MAX_DAYS_WITHOUT_PRAYING) {
                     it.addStatusEffect(StatusEffectInstance(StatusEffects.POISON, 10 * 20))
                     it.sendMessage(
                         Text
