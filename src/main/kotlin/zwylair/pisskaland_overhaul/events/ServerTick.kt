@@ -7,8 +7,11 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import net.minecraft.util.math.BlockPos
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.config.PrayConfig
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
@@ -85,6 +88,20 @@ object ServerTick {
                         Text
                             .translatable("${PSO.MODID}.pray.became_a_devout")
                             .formatted(Formatting.DARK_AQUA)
+                    )
+                }
+
+                if (PrayConfig.isPlayerDevout(it.gameProfile)) {
+                    it.addStatusEffect(StatusEffectInstance(StatusEffects.SATURATION, 15 * 20))
+                    it.addExperience(7)
+                    world.playSound(
+                        it, BlockPos.ofFloored(it.pos),
+                        SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT
+                    )
+                    it.sendMessage(
+                        Text
+                            .translatable("${PSO.MODID}.pray.prayed_day_as_devout")
+                            .formatted(Formatting.GREEN)
                     )
                 }
             } else {

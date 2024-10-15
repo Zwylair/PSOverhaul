@@ -20,6 +20,7 @@
   "pisskaland_overhaul.pray.failed": "The structure of altar is wrong",
   "pisskaland_overhaul.pray.became_a_devout": "You get the feeling that prayer empowers you...",
   "pisskaland_overhaul.pray.pray_streak_was_zeroed": "Looks like you missed today's prayer...",
+  "pisskaland_overhaul.pray.prayed_day_as_devout": "Today, you feel better than usual...",
   "pisskaland_overhaul.pray.already": "You have already prayed",
   "pisskaland_overhaul.pray.too_many_days_without_praying": "You've gone too long without praying...",
   "command.pisskaland_overhaul.config.reload.success": "Config was successfully reloaded"

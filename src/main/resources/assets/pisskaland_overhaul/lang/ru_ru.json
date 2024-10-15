@@ -20,6 +20,7 @@
   "pisskaland_overhaul.pray.failed": "Структура алтаря неправильная",
   "pisskaland_overhaul.pray.became_a_devout": "У вас возникает ощущение, что молитва придает вам силы...",
   "pisskaland_overhaul.pray.pray_streak_was_zeroed": "Кажись, вы пропустили сегодняшнюю молитву...",
+  "pisskaland_overhaul.pray.prayed_day_as_devout": "Сегодня вы чувствуете себя лучше, чем обычно...",
   "pisskaland_overhaul.pray.already": "Вы уже помолились",
   "pisskaland_overhaul.pray.too_many_days_without_praying": "Вы слишком долго не молились...",
   "command.pisskaland_overhaul.config.reload.success": "Конфигурация была успешно перезагружена"
