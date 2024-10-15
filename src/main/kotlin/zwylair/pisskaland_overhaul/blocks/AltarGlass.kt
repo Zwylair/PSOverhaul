@@ -2,10 +2,14 @@ package zwylair.pisskaland_overhaul.blocks
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemGroup
 import net.minecraft.registry.RegistryKey
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import zwylair.pisskaland_overhaul.ModObject
@@ -35,7 +39,7 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
         firstStructureLayer, secondStructureLayer, thirdStructureLayer
     )
 
-    @Deprecated("Deprecated")
+    @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
     override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: net.minecraft.util.math.random.Random) {
         var layerCounter = 0
         for (layer in structureLayers) {
@@ -87,8 +91,23 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
         } else { world.scheduleBlockTick(pos, this, 20) }
     }
 
-    @Deprecated("Deprecated")
+    @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
         if (!world.isClient) { world.scheduleBlockTick(pos, this, 0) }
+    }
+
+    @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
+    override fun onUse(
+        state: BlockState,
+        world: World,
+        pos: BlockPos,
+        player: PlayerEntity,
+        hand: Hand,
+        hit: BlockHitResult
+    ): ActionResult? {
+        if (world.isClient) return ActionResult.PASS
+
+
+        return ActionResult.PASS
     }
 }
