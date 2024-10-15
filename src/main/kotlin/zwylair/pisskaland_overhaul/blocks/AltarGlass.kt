@@ -16,9 +16,9 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.ModObject
 import zwylair.pisskaland_overhaul.PSO
+import zwylair.pisskaland_overhaul.config.PrayConfig
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 
 class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
@@ -122,13 +122,13 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
             return ActionResult.SUCCESS
         }
 
-        if (ModConfig.didPlayerPray(player.gameProfile)) {
+        if (PrayConfig.didPlayerPray(player.gameProfile)) {
             world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.AMBIENT)
             player.sendMessage(Text.translatable("${PSO.MODID}.pray.already").formatted(Formatting.RED))
             return ActionResult.SUCCESS
         }
 
-        ModConfig.prayPlayer(player.gameProfile)
+        PrayConfig.prayPlayer(player.gameProfile)
         world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.AMBIENT)
         player.sendMessage(Text.translatable("${PSO.MODID}.pray.success").formatted(Formatting.DARK_GREEN))
 

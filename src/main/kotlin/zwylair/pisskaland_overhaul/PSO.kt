@@ -10,6 +10,7 @@ import zwylair.pisskaland_overhaul.commands.ConfigManage
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.commands.MoneyManage
+import zwylair.pisskaland_overhaul.config.Config
 import zwylair.pisskaland_overhaul.events.PlayerBlockBreak
 import zwylair.pisskaland_overhaul.soundevents.ModSoundEvents
 import zwylair.pisskaland_overhaul.events.ServerPlayConnectionEvents
@@ -40,7 +41,7 @@ class PSO : ModInitializer {
         PlayerBlockBreak.register()
         ServerTick.register()
         ModNetworking.registerServer()
-        ModConfig.loadConfig()
+        Config.loadConfig()
 
         LOGGER.info("PisskaLandOverhaul has been initialized!")
     }

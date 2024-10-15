@@ -9,8 +9,9 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.PSO
+import zwylair.pisskaland_overhaul.config.ModSettings
+import zwylair.pisskaland_overhaul.config.PrayConfig
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ServerTick {
@@ -72,22 +73,22 @@ object ServerTick {
         notFinishedDayTicks = -1
 
         world.server.playerManager.playerList.forEach {
-            if (ModConfig.didPlayerPray(it.gameProfile)) {
-                ModConfig.setPlayerNotPrayedCount(it.gameProfile, 0)
+            if (PrayConfig.didPlayerPray(it.gameProfile)) {
+                PrayConfig.setPlayerNotPrayedCount(it.gameProfile, 0)
             } else {
-                val notPrayedDays = ModConfig.increasePlayerNotPrayedCount(it.gameProfile)
-                if (notPrayedDays >= ModConfig.MAX_DAYS_WITHOUT_PRAYING) {
+                val notPrayedDays = PrayConfig.increasePlayerNotPrayedCount(it.gameProfile)
+                if (notPrayedDays >= ModSettings.MAX_DAYS_WITHOUT_PRAYING) {
                     it.addStatusEffect(StatusEffectInstance(StatusEffects.POISON, 10 * 20))
                     it.sendMessage(
                         Text
                             .translatable("${PSO.MODID}.pray.too_many_days_without_praying")
                             .formatted(Formatting.RED)
                     )
-                    ModConfig.setPlayerNotPrayedCount(it.gameProfile, 0)
+                    PrayConfig.setPlayerNotPrayedCount(it.gameProfile, 0)
                 }
             }
         }
 
-        ModConfig.resetAllPrays()
+        PrayConfig.resetAllPrays()
     }
 }

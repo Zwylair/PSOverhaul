@@ -6,7 +6,7 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import zwylair.pisskaland_overhaul.ModConfig
+import zwylair.pisskaland_overhaul.config.Config
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
 
@@ -30,7 +30,7 @@ object ConfigManage {
             return 0
         }
 
-        ModConfig.loadConfig()
+        Config.loadConfig()
         ctx.source.sendFeedback(
             { Text.translatable("command.${PSO.MODID}.config.reload.success").formatted(Formatting.GREEN) },
             false

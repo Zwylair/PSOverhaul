@@ -11,9 +11,9 @@ import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
+import zwylair.pisskaland_overhaul.config.MoneyConfig
 import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.items.SVOBucks
 
@@ -128,15 +128,15 @@ object MoneyManage {
         if (playerGiveTo == null) {
             executorPlayer.inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS).copyWithCount(amount))
             ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.svobucks.increase.success").formatted(Formatting.GRAY) },
+                { Text.translatable("command.${PSO.MODID}.wallet.increase.success").formatted(Formatting.GRAY) },
                 false
             )
             return 1
         }
 
-        ModConfig.updateMoneyAmount(
+        MoneyConfig.updateMoneyAmount(
             playerGiveTo.gameProfile,
-            ModConfig.getMoneyAmount(playerGiveTo.gameProfile) + amount
+            MoneyConfig.getMoneyAmount(playerGiveTo.gameProfile) + amount
         )
         ctx.source.sendFeedback(
             { Text.translatable("command.${PSO.MODID}.wallet.increase.success").formatted(Formatting.GRAY) },
@@ -151,7 +151,7 @@ object MoneyManage {
         playerReduceTo: PlayerEntity?
     ): Int {
         val executorPlayer = ctx.source.player?: return 0
-        val balance = ModConfig.getMoneyAmount((playerReduceTo?: executorPlayer).gameProfile)
+        val balance = MoneyConfig.getMoneyAmount((playerReduceTo?: executorPlayer).gameProfile)
 
         if (!ctx.source.hasPermissionLevel(ctx.source.server.opPermissionLevel)) {
             ctx.source.sendFeedback(
@@ -160,8 +160,6 @@ object MoneyManage {
             )
             return 1
         }
-
-        LOGGER.info("reduceCoins: amount: $amount, balance: $balance")
 
         if (amount > balance) {
             ctx.source.sendFeedback(
@@ -172,7 +170,7 @@ object MoneyManage {
         }
 
         if (playerReduceTo == null) {
-            ModConfig.updateMoneyAmount(executorPlayer.gameProfile, balance - amount)
+            MoneyConfig.updateMoneyAmount(executorPlayer.gameProfile, balance - amount)
             ctx.source.sendFeedback(
                 { Text.translatable("command.${PSO.MODID}.wallet.reduce.success").formatted(Formatting.GRAY) },
                 false
@@ -180,7 +178,7 @@ object MoneyManage {
             return 1
         }
 
-        ModConfig.updateMoneyAmount(playerReduceTo.gameProfile, balance - amount)
+        MoneyConfig.updateMoneyAmount(playerReduceTo.gameProfile, balance - amount)
         ctx.source.sendFeedback(
             { Text.translatable("command.${PSO.MODID}.wallet.reduce.success").formatted(Formatting.GRAY) },
             false
@@ -200,7 +198,7 @@ object MoneyManage {
             return 1
         }
 
-        ModConfig.updateMoneyAmount(playerEraseTo.gameProfile, 0)
+        MoneyConfig.updateMoneyAmount(playerEraseTo.gameProfile, 0)
         ctx.source.sendFeedback(
             { Text.translatable("command.${PSO.MODID}.wallet.erase.success").formatted(Formatting.GRAY) },
             false
