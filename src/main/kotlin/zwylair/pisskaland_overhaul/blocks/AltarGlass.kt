@@ -6,12 +6,17 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemGroup
 import net.minecraft.registry.RegistryKey
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvents
+import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
+import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import zwylair.pisskaland_overhaul.ModConfig
 import zwylair.pisskaland_overhaul.ModObject
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
@@ -39,8 +44,7 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
         firstStructureLayer, secondStructureLayer, thirdStructureLayer
     )
 
-    @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: net.minecraft.util.math.random.Random) {
+    private fun checkStructure(world: World, pos: BlockPos): Boolean {
         var layerCounter = 0
         for (layer in structureLayers) {
             layerCounter++
@@ -48,7 +52,6 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
             var y = -(structureLayers.size - layerCounter)
             var z = -1
 
-            // check structure
             for (line in layer) {
                 var x = -1
 
@@ -65,13 +68,20 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
 //                        )
                         world.setBlockState(pos.add(x, y, z), Blocks.DIAMOND_BLOCK.defaultState)
                         world.scheduleBlockTick(pos, this, 20)
-                        return
+                        return false
                     }
                     x++
                 }
                 z++
             }
         }
+
+        return true
+    }
+
+    @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
+    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: net.minecraft.util.math.random.Random) {
+        if (!checkStructure(world, pos)) return
 
         val players = world.getPlayers { player ->
             player.squaredDistanceTo(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()) < 100
@@ -105,9 +115,23 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
         hand: Hand,
         hit: BlockHitResult
     ): ActionResult? {
-        if (world.isClient) return ActionResult.PASS
+        if (world.isClient) return ActionResult.SUCCESS
 
+        if (!checkStructure(world, pos)) {
+            player.sendMessage(Text.translatable("${PSO.MODID}.pray.failed").formatted(Formatting.RED))
+            return ActionResult.SUCCESS
+        }
 
-        return ActionResult.PASS
+        if (ModConfig.didPlayerPray(player.gameProfile)) {
+            world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.AMBIENT)
+            player.sendMessage(Text.translatable("${PSO.MODID}.pray.already").formatted(Formatting.RED))
+            return ActionResult.SUCCESS
+        }
+
+        ModConfig.prayPlayer(player.gameProfile)
+        world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.AMBIENT)
+        player.sendMessage(Text.translatable("${PSO.MODID}.pray.success").formatted(Formatting.DARK_GREEN))
+
+        return ActionResult.SUCCESS
     }
 }
