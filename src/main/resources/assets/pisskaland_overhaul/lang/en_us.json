@@ -15,5 +15,9 @@
   "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: The mod version does not match the server one",
   "block.pisskaland_overhaul.altar_glass": "Altar Glass",
   "advancement.pisskaland_overhaul.make_altar.title": "Do you believe in God?",
-  "advancement.pisskaland_overhaul.make_altar.description": "Build and complete the altar"
+  "advancement.pisskaland_overhaul.make_altar.description": "Build and complete the altar",
+  "pisskaland_overhaul.pray.success": "You have prayed",
+  "pisskaland_overhaul.pray.already": "You have already prayed",
+  "pisskaland_overhaul.pray.too_many_days_without_praying": "You've gone too long without praying...",
+  "command.pisskaland_overhaul.config.reload.success": "Config was successfully reloaded"
 }

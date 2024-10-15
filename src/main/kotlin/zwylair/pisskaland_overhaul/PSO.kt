@@ -6,6 +6,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.util.Identifier
 import zwylair.pisskaland_overhaul.blocks.ModBlocks
+import zwylair.pisskaland_overhaul.commands.ConfigManage
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.commands.MoneyManage
@@ -32,6 +33,7 @@ class PSO : ModInitializer {
         ModItems.init()
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             MoneyManage.register(dispatcher)
+            ConfigManage.register(dispatcher)
         }
         ServerPlayConnectionEvents.register()
         ServerLivingEntity.register()

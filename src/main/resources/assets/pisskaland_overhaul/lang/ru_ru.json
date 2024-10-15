@@ -15,5 +15,9 @@
   "pisskaland_overhaul.version_mismatched": "PisskaLand Overhaul: Версия мода не совпадает с серверной",
   "block.pisskaland_overhaul.altar_glass": "Стекло алтаря",
   "advancement.pisskaland_overhaul.make_altar.title": "А вы верите в бога?",
-  "advancement.pisskaland_overhaul.make_altar.description": "Создайте и завершите алтарь"
+  "advancement.pisskaland_overhaul.make_altar.description": "Создайте и завершите алтарь",
+  "pisskaland_overhaul.pray.success": "Вы помолились",
+  "pisskaland_overhaul.pray.already": "Вы уже помолились",
+  "pisskaland_overhaul.pray.too_many_days_without_praying": "Вы слишком долго не молились...",
+  "command.pisskaland_overhaul.config.reload.success": "Конфигурация была успешно перезагружена"
 }
