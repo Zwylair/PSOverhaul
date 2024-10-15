@@ -66,7 +66,6 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
 //                            "\t\tblock: ${line.indexOf(block)}\n" +
 //                            "\t${block.name.string} expected"
 //                        )
-                        world.setBlockState(pos.add(x, y, z), Blocks.DIAMOND_BLOCK.defaultState)
                         world.scheduleBlockTick(pos, this, 20)
                         return false
                     }
