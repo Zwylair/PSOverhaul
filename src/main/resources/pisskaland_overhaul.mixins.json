@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "zwylair.pisskaland_overhaul.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerInventoryMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
