@@ -14,6 +14,7 @@ object Config {
     var moneyData = JsonObject()
     var prayData = JsonObject()
     var denyListData = JsonObject()
+    var eatenData = JsonObject()
 
     fun saveConfig() {
         val json = JsonObject()

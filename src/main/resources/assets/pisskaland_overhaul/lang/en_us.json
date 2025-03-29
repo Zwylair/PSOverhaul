@@ -27,5 +27,7 @@
   "command.pisskaland_overhaul.denylist.add.success": "Item was successfully added into denylist!",
   "command.pisskaland_overhaul.denylist.add.already_in_list": "This item is already in denylist!",
   "command.pisskaland_overhaul.denylist.remove.success": "Item was successfully removed from denylist!",
-  "command.pisskaland_overhaul.denylist.remove.not_in_list": "This item is not in denylist!"
+  "command.pisskaland_overhaul.denylist.remove.not_in_list": "This item is not in denylist!",
+  "pisskaland_overhaul.chow_down_on.eaten_once": "You're eventually getting bored of eating the same food multiple times...",
+  "pisskaland_overhaul.chow_down_on.eaten_twice": "I won't eat it."
 }
