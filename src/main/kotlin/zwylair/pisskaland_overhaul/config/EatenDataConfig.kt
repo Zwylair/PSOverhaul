@@ -39,4 +39,8 @@ object EatenDataConfig {
         var eatenCount = getEatenCount(profile, item)?: return false
         return eatenCount == 2
     }
+
+    fun wipe() {
+        eatenData = JsonObject()
+    }
 }

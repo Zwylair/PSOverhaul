@@ -23,5 +23,11 @@
   "pisskaland_overhaul.pray.prayed_day_as_devout": "Сегодня вы чувствуете себя лучше, чем обычно...",
   "pisskaland_overhaul.pray.already": "Вы уже помолились",
   "pisskaland_overhaul.pray.too_many_days_without_praying": "Вы слишком долго не молились...",
-  "command.pisskaland_overhaul.config.reload.success": "Конфигурация была успешно перезагружена"
+  "command.pisskaland_overhaul.config.reload.success": "Конфигурация была успешно перезагружена",
+  "command.pisskaland_overhaul.denylist.add.success": "Предмет успешно добавлен в денилист!",
+  "command.pisskaland_overhaul.denylist.add.already_in_list": "Этот предмет уже есть в денилисте!",
+  "command.pisskaland_overhaul.denylist.remove.success": "Предмет был успешно удален из денилиста!",
+  "command.pisskaland_overhaul.denylist.remove.not_in_list": "Этого предмета нет в денилисте!",
+  "pisskaland_overhaul.chow_down_on.eaten_once": "В конце концов тебе надоедает есть одну и ту же еду по нескольку раз...",
+  "pisskaland_overhaul.chow_down_on.eaten_twice": "Я не буду это есть."
 }

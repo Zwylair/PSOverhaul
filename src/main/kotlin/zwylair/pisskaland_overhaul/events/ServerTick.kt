@@ -10,6 +10,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockPos
 import zwylair.pisskaland_overhaul.PSO
+import zwylair.pisskaland_overhaul.config.EatenDataConfig
 import zwylair.pisskaland_overhaul.config.PrayConfig
 
 object ServerTick {
@@ -20,6 +21,7 @@ object ServerTick {
     fun register() {
         PSO.LOGGER.info("Trying to register ServerTick events")
 
+        ServerTickEvents.END_WORLD_TICK.register(::chowDownWiper)
         ServerTickEvents.END_WORLD_TICK.register(::prayerCheck)
     }
 
@@ -94,5 +96,12 @@ object ServerTick {
         }
 
         PrayConfig.resetAllPrays()
+    }
+
+    private fun chowDownWiper(world: ServerWorld) {
+        if (checkForPrayCount < CHECK_FOR_PRAY_TIMEOUT) { return }
+        val localNotFinishedDayTicks = world.timeOfDay % 24000
+        if (localNotFinishedDayTicks > notFinishedDayTicks) { return }
+        EatenDataConfig.wipe()
     }
 }

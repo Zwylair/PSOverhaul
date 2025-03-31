@@ -4,6 +4,8 @@
   "package": "zwylair.pisskaland_overhaul.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "LivingEntityAccessor",
+    "LivingEntityMixins",
     "PlayerInventoryMixin"
   ],
   "client": [],
