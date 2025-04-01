@@ -15,8 +15,7 @@ import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object PlayerBlockBreak {
     val blockCoinDropChance = mapOf(
-        Blocks.STONE to listOf(1, 1000),
-        Blocks.DEEPSLATE to listOf(1, 800)
+        Blocks.GOLD_ORE to listOf(1, 30)
     )
 
     fun register() {
