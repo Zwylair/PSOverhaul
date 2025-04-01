@@ -39,7 +39,6 @@ class PSO : ModInitializer {
             ConfigManage.register(dispatcher)
             ItemsDenyList.register(dispatcher, registryAccess)
         }
-
         ServerPlayConnectionEvents.register()
         ServerLivingEntity.register()
         ServerTick.register()
