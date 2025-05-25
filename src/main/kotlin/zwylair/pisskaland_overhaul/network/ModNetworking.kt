@@ -13,8 +13,8 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import zwylair.pisskaland_overhaul.PSO
-import zwylair.pisskaland_overhaul.config.ModSettings
-import zwylair.pisskaland_overhaul.config.MoneyConfig
+import zwylair.pisskaland_overhaul.Constants
+import zwylair.pisskaland_overhaul.config.MoneySubConfig
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object ModNetworking {
@@ -36,9 +36,9 @@ object ModNetworking {
             val amount = buf.readInt()
 
             server.execute {
-                MoneyConfig.updateMoneyAmount(
+                MoneySubConfig.updateBalance(
                     playerGameProfile,
-                    MoneyConfig.getMoneyAmount(playerGameProfile) + amount
+                    MoneySubConfig.getBalance(playerGameProfile) + amount
                 )
             }
         }
@@ -92,7 +92,7 @@ object ModNetworking {
                 val targetPlayer = server.playerManager.playerList.firstOrNull { it.gameProfile == playerGameProfile }
 
                 if (targetPlayer != null) {
-                    val moneyAmount = MoneyConfig.getMoneyAmount(targetPlayer.gameProfile)
+                    val moneyAmount = MoneySubConfig.getBalance(targetPlayer.gameProfile)
                     val responseBuf = PacketByteBufs.create()
                     responseBuf.writeInt(moneyAmount)
                     ServerPlayNetworking.send(targetPlayer, FETCH_PLAYER_MONEY_AMOUNT, responseBuf)
@@ -123,7 +123,7 @@ object ModNetworking {
 //            PSO.LOGGER.info("[PSO Client] serverVersion: $serverModVersion; compatibleServerVersions: ${Config.COMPATIBLE_SERVER_MOD_VERSIONS}")
 
             client.execute {
-                if (!ModSettings.COMPATIBLE_SERVER_MOD_VERSIONS.contains(serverModVersion)) {
+                if (!Constants.COMPATIBLE_SERVER_MOD_VERSIONS.contains(serverModVersion)) {
                     handler.connection.disconnect(
                         Text.translatable("pisskaland_overhaul.version_mismatched")
                             .formatted(Formatting.BOLD)

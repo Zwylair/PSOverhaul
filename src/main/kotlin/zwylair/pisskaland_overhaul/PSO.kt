@@ -7,18 +7,22 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.util.Identifier
 import zwylair.pisskaland_overhaul.blocks.ModBlocks
 import zwylair.pisskaland_overhaul.commands.ConfigManage
-import zwylair.pisskaland_overhaul.commands.ItemsDenyList
+import zwylair.pisskaland_overhaul.commands.DenyList
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.commands.MoneyManage
 import zwylair.pisskaland_overhaul.config.Config
-import zwylair.pisskaland_overhaul.events.HotbarSwapEvents
+import zwylair.pisskaland_overhaul.config.DenyListSubConfig
+import zwylair.pisskaland_overhaul.config.EatenSubConfig
+import zwylair.pisskaland_overhaul.config.MoneySubConfig
+import zwylair.pisskaland_overhaul.config.PraySubConfig
+import zwylair.pisskaland_overhaul.events.DayChangeTicker
+import zwylair.pisskaland_overhaul.events.SlotActions
 import zwylair.pisskaland_overhaul.events.PlayerBlockBreak
 import zwylair.pisskaland_overhaul.events.PlayerPickupItem
 import zwylair.pisskaland_overhaul.soundevents.ModSoundEvents
 import zwylair.pisskaland_overhaul.events.ServerPlayConnectionEvents
 import zwylair.pisskaland_overhaul.events.ServerLivingEntity
-import zwylair.pisskaland_overhaul.events.ServerTick
 import zwylair.pisskaland_overhaul.network.ModNetworking
 
 class PSO : ModInitializer {
@@ -31,23 +35,34 @@ class PSO : ModInitializer {
     override fun onInitialize() {
         LOGGER.info("PisskaLandOverhaul has started initialization...")
 
+        // items, blocks, etc
         ModSoundEvents.init()
         ModItemGroups.init()
         ModBlocks.init()
         ModItems.init()
+
+        // commands
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, _ ->
             MoneyManage.register(dispatcher)
             ConfigManage.register(dispatcher)
-            ItemsDenyList.register(dispatcher, registryAccess)
+            DenyList.register(dispatcher, registryAccess)
         }
+
+        // events
         ServerPlayConnectionEvents.register()
         ServerLivingEntity.register()
-        ServerTick.register()
+        DayChangeTicker.register()
         ModNetworking.registerServer()
         PlayerBlockBreak.register()
         PlayerPickupItem.register()
-        HotbarSwapEvents.register()
-        Config.loadConfig()
+        SlotActions.register()
+
+        // config
+        Config.addSubConfig(DenyListSubConfig)
+        Config.addSubConfig(EatenSubConfig)
+        Config.addSubConfig(MoneySubConfig)
+        Config.addSubConfig(PraySubConfig)
+        Config.load()
 
         LOGGER.info("PisskaLandOverhaul has been initialized!")
     }

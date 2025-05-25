@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import zwylair.pisskaland_overhaul.PSO;
-import zwylair.pisskaland_overhaul.config.EatenDataConfig;
+import zwylair.pisskaland_overhaul.config.EatenSubConfig;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixins {
@@ -30,7 +30,7 @@ public abstract class LivingEntityMixins {
 
         var its = ((LivingEntity) (Object) this);
         PlayerEntity player = (PlayerEntity) its;
-        EatenDataConfig eatenDataConfig = EatenDataConfig.INSTANCE;
+        EatenSubConfig eatenDataConfig = EatenSubConfig.INSTANCE;
 
         if (!world.isClient()) {
             Integer eatenCount = eatenDataConfig.getEatenCount(player.getGameProfile(), stack.getItem());

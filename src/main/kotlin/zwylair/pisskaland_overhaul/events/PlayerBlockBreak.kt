@@ -14,18 +14,21 @@ import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems.SVOBUCKS
 
 object PlayerBlockBreak {
-    val blockCoinDropChance = mapOf(
+    private val blockCoinDropChance = mapOf(
         Blocks.GOLD_ORE to listOf(1, 30)
     )
 
     fun register() {
-        PSO.LOGGER.info("Trying to register PlayerBlockBreak events")
-
+        PSO.LOGGER.info("Registering PlayerBlockBreak events")
         PlayerBlockBreakEvents.AFTER.register(::breakBlock)
     }
 
+    private fun randRange(range: List<Int>): Int {
+        return Random.nextInt(range[0], range[1])
+    }
+
     private fun spawnItem(world: World, pos: BlockPos) {
-        val coinItemStuck = ItemStack(SVOBUCKS).copyWithCount(1)
+        val coinItemStuck = ItemStack(SVOBUCKS, 1)
         val (x, y, z) = listOf(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
         val coinEntity = ItemEntity(world, x, y, z, coinItemStuck)
         world.spawnEntity(coinEntity)
@@ -40,10 +43,9 @@ object PlayerBlockBreak {
     ) {
         if (world.isClient) return
 
-        blockCoinDropChance.forEach {
-            val (block, range) = it
-            if (state.block == block)
-                if (Random.nextInt(range[0], range[1]) == 1) spawnItem(world, pos)
+        for ((block, range) in blockCoinDropChance) {
+            if (state.block == block && randRange(range) == 1)
+                spawnItem(world, pos)
         }
     }
 }

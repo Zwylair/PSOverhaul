@@ -8,13 +8,12 @@ import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.util.ActionResult
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.callbacks.HotbarSwapCallback
-import zwylair.pisskaland_overhaul.config.DenyListConfig
+import zwylair.pisskaland_overhaul.config.DenyListSubConfig
 import zwylair.pisskaland_overhaul.items.ModItems
 
-object HotbarSwapEvents {
+object SlotActions {
     fun register() {
-        PSO.LOGGER.info("Trying to register HotbarSwapEvents events")
-
+        PSO.LOGGER.info("Registering SlotActions events")
         HotbarSwapCallback.EVENT.register(::deniedItemsCheck)
     }
 
@@ -25,8 +24,8 @@ object HotbarSwapEvents {
         val screenStack = screenHandler.getSlot(slotIndex).stack
         val itemId = screenStack.translationKey
 
-        if (DenyListConfig.isAlreadyInDenyList(itemId)) {
-            val reward = DenyListConfig.getReward(itemId)?: 0
+        if (DenyListSubConfig.has(itemId)) {
+            val reward = DenyListSubConfig.getReward(itemId)?: 0
 
             player.inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS, reward * screenStack.count))
             screenHandler.setStackInSlot(slotIndex, screenHandler.nextRevision(), ItemStack(Items.AIR))

@@ -20,28 +20,37 @@ object ServerLivingEntity {
     )
 
     fun register() {
-        PSO.LOGGER.info("Trying to register ServerLivingEntity events")
-
+        PSO.LOGGER.info("Registering ServerLivingEntity events")
         ServerLivingEntityEvents.AFTER_DEATH.register(::dropCoin)
     }
 
+    private fun randRange(range: List<Int>): Int {
+        return Random.nextInt(range[0], range[1])
+    }
+
     private fun spawnItem(entity: LivingEntity, coinAmount: Int) {
-        val coinItemStuck = ItemStack(SVOBUCKS).copyWithCount(coinAmount)
+        val coinItemStuck = ItemStack(SVOBUCKS, coinAmount)
         val coinEntity = ItemEntity(entity.world, entity.x, entity.y, entity.z, coinItemStuck)
         entity.world.spawnEntity(coinEntity)
     }
 
     private fun dropCoin(entity: LivingEntity, damageSource: DamageSource) {
-        damageSource.source?: return
-        if (!damageSource.source!!.isPlayer) return
+        if (damageSource.source?.isPlayer == false)
+            return
 
-        mobCoinDropChance.forEach {
-            val (entityType, coinAmount) = it
-            if (entity.type == entityType) { spawnItem(entity, Random.nextInt(coinAmount[0], coinAmount[1])) }
+        if (entity.isPlayer || entity !is HostileEntity)
+            return
+
+        if (entity.type in mobCoinDropChance.keys) {
+            for ((entityType, coinAmount) in mobCoinDropChance) {
+                if (entity.type == entityType) {
+                    spawnItem(entity, randRange(coinAmount))
+                }
+            }
+            return
         }
 
-        if (entity.isPlayer) return
-        if (entity !is HostileEntity) return
-        if (Random.nextInt(1, 20) == 1) spawnItem(entity, 1)
+        if (randRange(listOf(1, 100)) == 1)
+            spawnItem(entity, 1)
     }
 }

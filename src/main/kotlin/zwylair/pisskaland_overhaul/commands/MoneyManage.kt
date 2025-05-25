@@ -3,6 +3,7 @@ package zwylair.pisskaland_overhaul.commands
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
@@ -13,199 +14,301 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
-import zwylair.pisskaland_overhaul.config.MoneyConfig
+import zwylair.pisskaland_overhaul.config.MoneySubConfig
 import zwylair.pisskaland_overhaul.items.ModItems
 import zwylair.pisskaland_overhaul.items.SVOBucks
 
 object MoneyManage {
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
-        LOGGER.info("Trying to register MoneyManage commands")
+        LOGGER.info("Registering MoneyManage commands")
 
-        dispatcher.register(literal("pso").then(literal("svobucks").then(literal("give").then(
-            argument("amount", IntegerArgumentType.integer())
-                    .executes{ giveCoinsToPlayer(it, IntegerArgumentType.getInteger(it, "amount"), null) }
-                        .then(argument("player", EntityArgumentType.player())
-                            .executes { giveCoinsToPlayer(it, IntegerArgumentType.getInteger(it, "amount"), EntityArgumentType.getPlayer(it, "player")) }
-        )))))
-
-        dispatcher.register(literal("pso").then(literal("svobucks").then(literal("erase").then(
-            argument("player", EntityArgumentType.player())
-                .executes { eraseCoinsFromPlayerInventory(it, EntityArgumentType.getPlayer(it, "player")) }
-        ))))
-
-        dispatcher.register(literal("pso").then(literal("wallet").then(literal("erase").then(
-            argument("player", EntityArgumentType.player())
-                .executes { erasePlayerWallet(it, EntityArgumentType.getPlayer(it, "player")) }
-            ))))
-
-        dispatcher.register(literal("pso").then(literal("wallet").then(literal("give").then(
-            argument("amount", IntegerArgumentType.integer())
-                .executes{ increasePlayerWallet(it, IntegerArgumentType.getInteger(it, "amount"), null) }
-                .then(argument("player", EntityArgumentType.player())
-                    .executes { increasePlayerWallet(it, IntegerArgumentType.getInteger(it, "amount"), EntityArgumentType.getPlayer(it, "player")) }
-        )))))
-
-        dispatcher.register(literal("pso").then(literal("wallet").then(literal("reduce").then(
-            argument("amount", IntegerArgumentType.integer())
-                .executes{ reducePlayerWallet(it, IntegerArgumentType.getInteger(it, "amount"), null) }
-                .then(argument("player", EntityArgumentType.player())
-                    .executes { reducePlayerWallet(it, IntegerArgumentType.getInteger(it, "amount"), EntityArgumentType.getPlayer(it, "player")) }
-        )))))
+        dispatcher.register(
+            literal("pso").then(
+                literal("svobucks")
+                    .then(buildGiveInvCoins())
+                    .then(buildClearInvCoins())
+            ).then(
+                literal("wallet")
+                    .then(buildGiveWalletCoins())
+                    .then(buildTakeWalletCoins())
+                    .then(buildClearWallet())
+            )
+        )
     }
 
-    private fun giveCoinsToPlayer(
+    // ----- $SVO -----
+
+    private fun buildGiveInvCoins(): LiteralArgumentBuilder<ServerCommandSource> {
+        return literal("give")
+            .then(argument("amount", IntegerArgumentType.integer())
+                .executes {
+                    val amount = IntegerArgumentType.getInteger(it, "amount")
+                    giveCoins(it, amount, null).code
+                }
+                .then(argument("player", EntityArgumentType.player())
+                    .executes {
+                        val amount = IntegerArgumentType.getInteger(it, "amount")
+                        val player = EntityArgumentType.getPlayer(it, "player")
+                        giveCoins(it, amount, player).code
+                    }
+                )
+            )
+    }
+
+    private fun buildClearInvCoins(): LiteralArgumentBuilder<ServerCommandSource> {
+        return literal("erase")
+            .then(argument("player", EntityArgumentType.player())
+                .executes {
+                    takeInventoryCoins(it, EntityArgumentType.getPlayer(it, "player")).code
+                }
+            )
+    }
+
+    // ----- Wallet -----
+
+    private fun buildGiveWalletCoins(): LiteralArgumentBuilder<ServerCommandSource> {
+        return literal("give")
+            .then(argument("amount", IntegerArgumentType.integer())
+                .executes {
+                    giveWalletCoins(it, IntegerArgumentType.getInteger(it, "amount"), null).code
+                }
+                .then(argument("player", EntityArgumentType.player())
+                    .executes {
+                        giveWalletCoins(
+                            it,
+                            IntegerArgumentType.getInteger(it, "amount"),
+                            EntityArgumentType.getPlayer(it, "player")
+                        ).code
+                    }
+                )
+            )
+    }
+
+    private fun buildTakeWalletCoins(): LiteralArgumentBuilder<ServerCommandSource> {
+        return literal("erase")
+            .then(argument("player", EntityArgumentType.player())
+                .executes {
+                    clearWalletCoins(it, EntityArgumentType.getPlayer(it, "player")).code
+                }
+            )
+    }
+
+    private fun buildClearWallet(): LiteralArgumentBuilder<ServerCommandSource> {
+        return literal("reduce")
+            .then(argument("amount", IntegerArgumentType.integer())
+                .executes {
+                    takeWalletCoins(it, IntegerArgumentType.getInteger(it, "amount"), null).code
+                }
+                .then(argument("player", EntityArgumentType.player())
+                    .executes {
+                        takeWalletCoins(
+                            it,
+                            IntegerArgumentType.getInteger(it, "amount"),
+                            EntityArgumentType.getPlayer(it, "player")
+                        ).code
+                    }
+                )
+            )
+    }
+
+    // ----- Functions -----
+
+    private fun giveCoins(
         ctx: CommandContext<ServerCommandSource>,
         amount: Int,
         playerSendTo: PlayerEntity?
-    ): Int {
-        val server = ctx.source.server
-        val executorPlayer = ctx.source.player?: return 0
+    ): CommandResult {
+        val source = ctx.source
+        val server = source.server
+        val executorPlayer = source.player?: return CommandResult.PASS
+        val inventory = playerSendTo?.inventory?: executorPlayer.inventory
 
-        if (!ctx.source.hasPermissionLevel(server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.pisskaland_overhaul.no_permission").formatted(Formatting.RED) },
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 0
+            return CommandResult.FAILURE
         }
 
-        if (playerSendTo == null) {
-            executorPlayer.inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS).copyWithCount(amount))
-            ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.svobucks.give.success").formatted(Formatting.GRAY) },
-                false
-            )
-            return 1
-        }
-
-        playerSendTo.inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS).copyWithCount(amount))
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.svobucks.give.success").formatted(Formatting.GRAY) },
+        inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS, amount))
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.svobucks.give.success")
+                    .formatted(Formatting.GRAY)
+            },
             false
         )
-        return 1
+        return CommandResult.SUCCESS
     }
 
-    private fun eraseCoinsFromPlayerInventory(
+    private fun takeInventoryCoins(
         ctx: CommandContext<ServerCommandSource>,
         playerEraseTo: PlayerEntity
-    ): Int {
-        if (!ctx.source.hasPermissionLevel(ctx.source.server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.pisskaland_overhaul.no_permission").formatted(Formatting.RED) },
+    ): CommandResult {
+        val source = ctx.source
+        val server = source.server
+
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 1
+            return CommandResult.FAILURE
         }
 
-        for (i in 0 until playerEraseTo.inventory.size()) {
-            val currentStack = playerEraseTo.inventory.getStack(i)
-            if (currentStack.item is SVOBucks) { playerEraseTo.inventory.removeStack(i) }
+        val inventory = playerEraseTo.inventory
+        for (i in 0 until inventory.size()) {
+            val currentStack = inventory.getStack(i)
+            if (currentStack.item is SVOBucks) { inventory.removeStack(i) }
         }
 
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.svobucks.erase.success").formatted(Formatting.GRAY) },
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.svobucks.erase.success")
+                    .formatted(Formatting.GRAY)
+            },
             false
         )
-        return 0
+        return CommandResult.SUCCESS
     }
 
-    private fun increasePlayerWallet(
+    private fun giveWalletCoins(
         ctx: CommandContext<ServerCommandSource>,
         amount: Int,
         playerGiveTo: PlayerEntity?
-    ): Int {
-        val executorPlayer = ctx.source.player?: return 0
+    ): CommandResult {
+        val source = ctx.source
+        val server = source.server
+        val executorPlayer = source.player?: return CommandResult.PASS
 
-        if (!ctx.source.hasPermissionLevel(ctx.source.server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.pisskaland_overhaul.no_permission").formatted(Formatting.RED) },
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 1
+            return CommandResult.FAILURE
         }
 
         if (playerGiveTo == null) {
-            MoneyConfig.updateMoneyAmount(
+            MoneySubConfig.updateBalance(
                 executorPlayer.gameProfile,
-                MoneyConfig.getMoneyAmount(executorPlayer.gameProfile) + amount
+                MoneySubConfig.getBalance(executorPlayer.gameProfile) + amount
             )
-            ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.wallet.increase.success").formatted(Formatting.GRAY) },
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.wallet.increase.success")
+                        .formatted(Formatting.GRAY)
+                },
                 false
             )
-            return 1
+            return CommandResult.SUCCESS
         }
 
-        MoneyConfig.updateMoneyAmount(
+        MoneySubConfig.updateBalance(
             playerGiveTo.gameProfile,
-            MoneyConfig.getMoneyAmount(playerGiveTo.gameProfile) + amount
+            MoneySubConfig.getBalance(playerGiveTo.gameProfile) + amount
         )
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.wallet.increase.success").formatted(Formatting.GRAY) },
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.wallet.increase.success")
+                    .formatted(Formatting.GRAY)
+            },
             false
         )
-        return 1
+        return CommandResult.SUCCESS
     }
 
-    private fun reducePlayerWallet(
+    private fun takeWalletCoins(
         ctx: CommandContext<ServerCommandSource>,
         amount: Int,
         playerReduceTo: PlayerEntity?
-    ): Int {
-        val executorPlayer = ctx.source.player?: return 0
-        val balance = MoneyConfig.getMoneyAmount((playerReduceTo?: executorPlayer).gameProfile)
+    ): CommandResult {
+        val source = ctx.source
+        val server = source.server
+        val executorPlayer = source.player?: return CommandResult.PASS
+        val balance = MoneySubConfig.getBalance((playerReduceTo?: executorPlayer).gameProfile)
 
-        if (!ctx.source.hasPermissionLevel(ctx.source.server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.pisskaland_overhaul.no_permission").formatted(Formatting.RED) },
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 1
+            return CommandResult.FAILURE
         }
 
         if (amount > balance) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.wallet.reduce.fail").formatted(Formatting.RED) },
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.wallet.reduce.fail")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 0
+            return CommandResult.FAILURE
         }
 
         if (playerReduceTo == null) {
-            MoneyConfig.updateMoneyAmount(executorPlayer.gameProfile, balance - amount)
-            ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.wallet.reduce.success").formatted(Formatting.GRAY) },
+            MoneySubConfig.updateBalance(executorPlayer.gameProfile, balance - amount)
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.wallet.reduce.success")
+                        .formatted(Formatting.GRAY)
+                },
                 false
             )
-            return 1
+            return CommandResult.SUCCESS
         }
 
-        MoneyConfig.updateMoneyAmount(playerReduceTo.gameProfile, balance - amount)
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.wallet.reduce.success").formatted(Formatting.GRAY) },
+        MoneySubConfig.updateBalance(playerReduceTo.gameProfile, balance - amount)
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.wallet.reduce.success")
+                    .formatted(Formatting.GRAY)
+            },
             false
         )
-        return 1
+        return CommandResult.SUCCESS
     }
 
-    private fun erasePlayerWallet(
+    private fun clearWalletCoins(
         ctx: CommandContext<ServerCommandSource>,
         playerEraseTo: PlayerEntity
-    ): Int {
-        if (!ctx.source.hasPermissionLevel(ctx.source.server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.pisskaland_overhaul.no_permission").formatted(Formatting.RED) },
+    ): CommandResult {
+        val source = ctx.source
+        val server = source.server
+
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 1
+            return CommandResult.FAILURE
         }
 
-        MoneyConfig.updateMoneyAmount(playerEraseTo.gameProfile, 0)
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.wallet.erase.success").formatted(Formatting.GRAY) },
+        MoneySubConfig.updateBalance(playerEraseTo.gameProfile, 0)
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.wallet.erase.success")
+                    .formatted(Formatting.GRAY)
+            },
             false
         )
-        return 0
+        return CommandResult.SUCCESS
     }
 }

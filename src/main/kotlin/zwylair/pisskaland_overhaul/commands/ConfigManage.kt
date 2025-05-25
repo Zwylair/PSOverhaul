@@ -12,29 +12,40 @@ import zwylair.pisskaland_overhaul.PSO.Companion.LOGGER
 
 object ConfigManage {
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
-        LOGGER.info("Trying to register ConfigManage commands")
-
-        dispatcher.register(literal("pso").then(literal("config").then(literal("reload")
-            .executes { giveCoinsToPlayer(it) }
-        )))
+        LOGGER.info("Registering ConfigManage commands")
+        dispatcher.register(buildConfigCommands())
     }
 
-    private fun giveCoinsToPlayer(ctx: CommandContext<ServerCommandSource>): Int {
-        val server = ctx.source.server
+    private fun buildConfigCommands() = literal("pso").then(
+        literal("config").then(
+            literal("reload")
+                .executes { reloadConfig(it).code }
+        )
+    )
 
-        if (!ctx.source.hasPermissionLevel(server.opPermissionLevel)) {
-            ctx.source.sendFeedback(
-                { Text.translatable("command.${PSO.MODID}.no_permission").formatted(Formatting.RED) },
+    private fun reloadConfig(ctx: CommandContext<ServerCommandSource>): CommandResult {
+        val source = ctx.source
+        val server = source.server
+
+        if (!source.hasPermissionLevel(server.opPermissionLevel)) {
+            source.sendFeedback(
+                {
+                    Text.translatable("command.${PSO.MODID}.no_permission")
+                        .formatted(Formatting.RED)
+                },
                 false
             )
-            return 0
+            return CommandResult.FAILURE
         }
 
-        Config.loadConfig()
-        ctx.source.sendFeedback(
-            { Text.translatable("command.${PSO.MODID}.config.reload.success").formatted(Formatting.GREEN) },
+        Config.load()
+        source.sendFeedback(
+            {
+                Text.translatable("command.${PSO.MODID}.config.reload.success")
+                    .formatted(Formatting.GREEN)
+            },
             false
         )
-        return 1
+        return CommandResult.SUCCESS
     }
 }
