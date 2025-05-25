@@ -1,0 +1,29 @@
+{
+  "criteria": {
+    "impossible_lol": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancement.pso.make_altar.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "pso:altar_glass"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.pso.make_altar.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible_lol"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

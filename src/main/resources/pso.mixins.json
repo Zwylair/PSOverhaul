@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "zwylair.pso.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "LivingEntityAccessor",
+    "LivingEntityMixins",
+    "PlayerInventoryMixin",
+    "ScreenHandlerMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "no_sound": {
+    "subtitle": "sounds.pso.no_sound",
+    "sounds": ["pso:no_sound"]
+  },
+  "server_anthem": {
+    "subtitle": "sounds.pso.server_anthem",
+    "sounds": ["pso:server_anthem"]
+  }
+}

@@ -1,37 +1,37 @@
 {
 	"schemaVersion": 1,
-	"id": "pisskaland_overhaul",
+	"id": "pso",
 	"version": "${version}",
-	"name": "PisskaLandOverhaul",
+	"name": "PSO",
 	"description": "Some things to make PisskaLand more funny",
 	"authors": [
 		"Zwylair"
 	],
 	"contact": {
-		"sources": "https://github.com/Zwylair/PisskaLandOverhaul"
+		"sources": "https://github.com/Zwylair/PSOverhaul"
 	},
 	"license": "MIT",
-	"icon": "assets/pisskaland_overhaul/icon.png",
+	"icon": "assets/pso/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"fabric-datagen": [
-			"zwylair.pisskaland_overhaul.PSODataGenerator"
+			"zwylair.pso.PSODataGenerator"
 		],
 		"main": [
 			{
-				"value": "zwylair.pisskaland_overhaul.PSO",
+				"value": "zwylair.pso.PSO",
 				"adapter": "kotlin"
 			}
 		],
 		"client": [
 			{
-				"value": "zwylair.pisskaland_overhaul.PSOClient",
+				"value": "zwylair.pso.PSOClient",
 				"adapter": "kotlin"
 			}
 		]
 	},
 	"mixins": [
-		"pisskaland_overhaul.mixins.json"
+		"pso.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.5",
