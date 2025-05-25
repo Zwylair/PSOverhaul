@@ -9,7 +9,7 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.util.Identifier
 import zwylair.pisskaland_overhaul.ModObject.ModItem
 import zwylair.pisskaland_overhaul.PSO
-import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups.PSO_ITEMGROUP_REG_KEY
+import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups.PSO_ITEM_GROUP_REG_KEY
 
 object ModItems {
     lateinit var WALLET: ModItem
@@ -19,7 +19,7 @@ object ModItems {
     fun init() {
         WALLET = register(WalletItem())
         SVOBUCKS = register(SVOBucks())
-        register(SERVER_ANTHEM_HORN, PSO.id("server_anthem_horn"), PSO_ITEMGROUP_REG_KEY)
+        register(SERVER_ANTHEM_HORN, PSO.id("server_anthem_horn"), PSO_ITEM_GROUP_REG_KEY)
     }
 
     private fun register(item: ModItem): ModItem {
@@ -46,7 +46,10 @@ object ModItems {
         logGroupAdding(item, itemGroupAddTo)
     }
 
-    private fun logItemRegistration(item: Item) { PSO.LOGGER.info("{} registered", item.translationKey) }
+    private fun logItemRegistration(item: Item) {
+        PSO.LOGGER.info("{} registered", item.translationKey)
+    }
+
     private fun logGroupAdding(item: Item, itemGroupRegKey: RegistryKey<ItemGroup>?) {
         PSO.LOGGER.info("{} added to {} ItemGroup", item.translationKey, itemGroupRegKey?.value?.toTranslationKey())
     }

@@ -5,15 +5,15 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayNetworkHandler
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.Constants
-import zwylair.pisskaland_overhaul.network.ModNetworking.sendServerVersionPacket
+import zwylair.pisskaland_overhaul.network.ModNetworking.sendServerVersion
 
 object ServerPlayConnectionEvents {
     fun register() {
         PSO.LOGGER.info("Registering ServerPlayConnection events")
-        ServerPlayConnectionEvents.INIT.register(::verifyPSOVersionWithServer)
+        ServerPlayConnectionEvents.INIT.register(::sendVersionToServer)
     }
 
-    private fun verifyPSOVersionWithServer(handler: ServerPlayNetworkHandler, server: MinecraftServer) {
-        sendServerVersionPacket(handler.player, Constants.MOD_VERSION)
+    private fun sendVersionToServer(handler: ServerPlayNetworkHandler, server: MinecraftServer) {
+        sendServerVersion(handler.player, Constants.MOD_VERSION)
     }
 }

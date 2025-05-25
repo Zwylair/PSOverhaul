@@ -1,6 +1,5 @@
 package zwylair.pisskaland_overhaul.items
 
-import com.mojang.authlib.GameProfile
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.Entity
@@ -9,13 +8,10 @@ import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryKey
-import net.minecraft.util.ClickType
-import net.minecraft.util.Hand
-import net.minecraft.util.TypedActionResult
-import net.minecraft.world.World
 import net.minecraft.screen.slot.Slot
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
+import net.minecraft.util.*
+import net.minecraft.world.World
 import zwylair.pisskaland_overhaul.ModObject.ModItem
 import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
@@ -23,101 +19,80 @@ import zwylair.pisskaland_overhaul.network.ModNetworking
 
 class WalletItem : ModItem(FabricItemSettings().maxCount(1)) {
     override var id = PSO.id("wallet")
-    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEMGROUP_REG_KEY
-    val fetchCoinsAmountTicksTimeout = 20
-    var fetchCoinsAmountTicksCounter = 0
+    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEM_GROUP_REG_KEY
 
-    fun incrementMoneyCount(
-        playerGameProfile: GameProfile,
-        amount: Int
-    ) {
-        ModNetworking.sendIncrementMoneyPacket(playerGameProfile, amount)
+    private var fetchTickCounter = 0
+    private val fetchTickTimeout = 20
+
+    private fun getOrCreateNbt(stack: ItemStack): NbtCompound {
+        if (!stack.hasNbt()) stack.nbt = NbtCompound()
+        return stack.nbt!!
     }
 
-    fun getEmptyNbt(): NbtCompound {
-        val nbt = NbtCompound()
-        nbt.putInt("moneyAmount", 0)
-        return nbt
+    private fun getMoney(stack: ItemStack): Int =
+        stack.nbt?.getInt("moneyAmount") ?: 0
+
+    private fun setMoney(stack: ItemStack, amount: Int) {
+        getOrCreateNbt(stack).putInt("moneyAmount", amount)
+        ModNetworking.sendUpdateItemNbt(stack, stack.nbt!!)
     }
 
-    fun updateMoneyNbt(player: PlayerEntity, itemStack: ItemStack) {
-        ModNetworking.sendFetchMoneyRequest(player) { moneyAmount ->
-            val nbt = if (itemStack.hasNbt()) { NbtCompound().copyFrom(itemStack.nbt!!) } else { getEmptyNbt() }
-            nbt.putInt("moneyAmount", moneyAmount)
-//            PSO.LOGGER.info("WalletItem updateMoneyNbt(): moneyAmount: $moneyAmount; put nbt moneyAmount: ${nbt.getInt("moneyAmount")}")
+    private fun syncMoneyFromServer(player: PlayerEntity, stack: ItemStack) {
+        ModNetworking.sendFetchMoneyRequest(player) { amount -> setMoney(stack, amount) }
+    }
 
-            itemStack.nbt = nbt
-            ModNetworking.sendUpdateItemStackNbtPacket(itemStack, nbt)
-        }
+    private fun adjustMoney(player: PlayerEntity, delta: Int) {
+        ModNetworking.sendIncrementMoney(player.gameProfile, delta)
     }
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
-        if (stack.hasNbt() && stack.nbt?.contains("moneyAmount") == true) {
-            val moneyAmount = stack.nbt!!.getInt("moneyAmount")
-
-            tooltip.add(Text
-                .translatable("item.${PSO.MODID}.wallet_tooltip_money_count")
-                .append(": $moneyAmount")
+        val amount = getMoney(stack)
+        tooltip.add(
+            Text.translatable("item.${PSO.MODID}.wallet_tooltip_money_count")
+                .append(": $amount")
                 .formatted(Formatting.GRAY)
-            )
-        } else {
-            tooltip.add(Text
-                .translatable("item.${PSO.MODID}.wallet_tooltip_money_count")
-                .append(": x")
-                .formatted(Formatting.GRAY)
-            )
-        }
+        )
     }
 
     override fun onStackClicked(stack: ItemStack, slot: Slot, clickType: ClickType, player: PlayerEntity): Boolean {
-        // client-side event?
-        // arguments:
-        //     stack: instance of WalletItem
-        //     slot: Slot that contains clicked item
+        if (
+            clickType != ClickType.RIGHT ||
+            !player.world.isClient ||
+            slot.stack.translationKey != ModItems.SVOBUCKS.translationKey
+        ) return true
 
-        if (clickType == ClickType.LEFT) { return false }
-        if (!player.world.isClient) { return false }
-        if (!slot.stack.translationKey.contains("${PSO.MODID}.svobucks")) { return true }
-
-        incrementMoneyCount(player.gameProfile, slot.stack.count)
+        val coinCount = slot.stack.count
+        adjustMoney(player, coinCount)
         player.inventory.removeStack(slot.index)
-        ModNetworking.sendClearSlotPacket(player.gameProfile, slot.index)
+        ModNetworking.sendClearSlot(player.gameProfile, slot.index)
         return true
     }
 
-    override fun inventoryTick(itemStack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
-        if (!world.isClient) { return }
-        fetchCoinsAmountTicksCounter++
+    override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
+        if (!world.isClient || entity !is PlayerEntity) return
 
-        if (fetchCoinsAmountTicksCounter >= fetchCoinsAmountTicksTimeout) {
-            updateMoneyNbt(entity as PlayerEntity, itemStack)
-            fetchCoinsAmountTicksCounter = 0
+        fetchTickCounter++
+        if (fetchTickCounter >= fetchTickTimeout) {
+            syncMoneyFromServer(entity, stack)
+            fetchTickCounter = 0
         }
     }
 
-    override fun use(world: World, player: PlayerEntity, hand: Hand): TypedActionResult<ItemStack?>? {
-        val itemStack = player.getStackInHand(hand)
-        if (!itemStack.hasNbt()) {
-            itemStack.nbt = NbtCompound()
-            itemStack.nbt!!.putInt("moneyAmount", 0)
-        }
+    override fun use(world: World, player: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
+        val stack = player.getStackInHand(hand)
+        getOrCreateNbt(stack) // ensure NBT exists
 
-        if (!world.isClient) { return TypedActionResult.pass(itemStack) }
+        if (!world.isClient) return TypedActionResult.pass(stack)
 
-        ModNetworking.sendFetchMoneyRequest(player) { moneyAmount ->
-            if (player.isSneaking && moneyAmount >= 10) {
-                itemStack.nbt!!.putInt("moneyAmount", moneyAmount - 10)
-                incrementMoneyCount(player.gameProfile, -10)
-                ModNetworking.sendGetCoinsPacket(player.gameProfile, 10)
-                updateMoneyNbt(player, itemStack)
-            } else if (moneyAmount >= 1) {
-                itemStack.nbt!!.putInt("moneyAmount", moneyAmount - 1)
-                incrementMoneyCount(player.gameProfile, -1)
-                ModNetworking.sendGetCoinsPacket(player.gameProfile, 1)
-                updateMoneyNbt(player, itemStack)
+        ModNetworking.sendFetchMoneyRequest(player) { currentAmount ->
+            val take = if (player.isSneaking && currentAmount >= 10) 10 else 1
+            if (currentAmount >= take) {
+                setMoney(stack, currentAmount - take)
+                adjustMoney(player, -take)
+                ModNetworking.sendGetCoins(player.gameProfile, take)
             }
         }
 
-        return TypedActionResult.success(itemStack)
+        return TypedActionResult.success(stack)
     }
 }

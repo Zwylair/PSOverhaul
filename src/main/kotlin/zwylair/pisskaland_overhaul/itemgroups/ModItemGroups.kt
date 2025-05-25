@@ -13,20 +13,20 @@ import zwylair.pisskaland_overhaul.PSO
 import zwylair.pisskaland_overhaul.items.ModItems
 
 object ModItemGroups {
-    lateinit var PSO_ITEMGROUP_ID: Identifier
-    lateinit var PSO_ITEMGROUP_REG_KEY: RegistryKey<ItemGroup>
-    lateinit var PSO_ITEMGROUP: ItemGroup
+    lateinit var PSO_ITEM_GROUP_ID: Identifier
+    lateinit var PSO_ITEM_GROUP_REG_KEY: RegistryKey<ItemGroup>
+    lateinit var PSO_ITEM_GROUP: ItemGroup
 
     fun init() {
-        PSO_ITEMGROUP_ID = PSO.id("main_item_group")
-        PSO_ITEMGROUP = FabricItemGroup.builder()
+        PSO_ITEM_GROUP_ID = PSO.id("main_item_group")
+        PSO_ITEM_GROUP = FabricItemGroup.builder()
             .icon { ItemStack(ModItems.SVOBUCKS) }
-            .displayName(Text.translatable("itemGroup.${PSO_ITEMGROUP_ID}"))
+            .displayName(Text.translatable("itemGroup.${PSO_ITEM_GROUP_ID}"))
             .build()
 
-        PSO_ITEMGROUP_REG_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, PSO_ITEMGROUP_ID)
+        PSO_ITEM_GROUP_REG_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, PSO_ITEM_GROUP_ID)
 
-        register(PSO_ITEMGROUP, PSO_ITEMGROUP_ID)
+        register(PSO_ITEM_GROUP, PSO_ITEM_GROUP_ID)
     }
 
     private fun register(itemGroup: ItemGroup, id: Identifier) {

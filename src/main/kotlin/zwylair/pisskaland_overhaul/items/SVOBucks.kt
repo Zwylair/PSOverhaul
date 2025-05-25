@@ -9,5 +9,5 @@ import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 
 class SVOBucks : ModItem(FabricItemSettings().maxCount(10)) {
     override var id = PSO.id("svobucks")
-    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEMGROUP_REG_KEY
+    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEM_GROUP_REG_KEY
 }

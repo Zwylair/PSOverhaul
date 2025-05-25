@@ -33,37 +33,53 @@ class PSO : ModInitializer {
     }
 
     override fun onInitialize() {
-        LOGGER.info("PisskaLandOverhaul has started initialization...")
+        LOGGER.info("PisskaLandOverhaul initializing...")
 
-        // items, blocks, etc
+        registerContent()
+        registerCommands()
+        registerEvents()
+        loadConfigs()
+
+        LOGGER.info("PisskaLandOverhaul initialized.")
+    }
+
+    private fun registerContent() {
         ModSoundEvents.init()
         ModItemGroups.init()
         ModBlocks.init()
         ModItems.init()
+    }
 
-        // commands
+    private fun registerCommands() {
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, _ ->
-            MoneyManage.register(dispatcher)
-            ConfigManage.register(dispatcher)
-            DenyList.register(dispatcher, registryAccess)
+            listOf(
+                { MoneyManage.register(dispatcher) },
+                { ConfigManage.register(dispatcher) },
+                { DenyList.register(dispatcher, registryAccess) }
+            ).forEach { it() }
         }
+    }
 
-        // events
-        ServerPlayConnectionEvents.register()
-        ServerLivingEntity.register()
-        DayChangeTicker.register()
-        ModNetworking.registerServer()
-        PlayerBlockBreak.register()
-        PlayerPickupItem.register()
-        SlotActions.register()
+    private fun registerEvents() {
+        listOf(
+            ServerPlayConnectionEvents::register,
+            ServerLivingEntity::register,
+            DayChangeTicker::register,
+            ModNetworking::registerServer,
+            PlayerBlockBreak::register,
+            PlayerPickupItem::register,
+            SlotActions::register
+        ).forEach { it() }
+    }
 
-        // config
-        Config.addSubConfig(DenyListSubConfig)
-        Config.addSubConfig(EatenSubConfig)
-        Config.addSubConfig(MoneySubConfig)
-        Config.addSubConfig(PraySubConfig)
+    private fun loadConfigs() {
+        listOf(
+            DenyListSubConfig,
+            EatenSubConfig,
+            MoneySubConfig,
+            PraySubConfig
+        ).forEach(Config::addSubConfig)
+
         Config.load()
-
-        LOGGER.info("PisskaLandOverhaul has been initialized!")
     }
 }

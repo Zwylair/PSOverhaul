@@ -15,6 +15,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.random.Random
 import net.minecraft.world.World
 import zwylair.pisskaland_overhaul.ModObject
 import zwylair.pisskaland_overhaul.PSO
@@ -23,86 +24,82 @@ import zwylair.pisskaland_overhaul.itemgroups.ModItemGroups
 
 class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
     override var id = PSO.id("altar_glass")
-    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEMGROUP_REG_KEY
+    override var itemGroupAddTo: RegistryKey<ItemGroup>? = ModItemGroups.PSO_ITEM_GROUP_REG_KEY
 
-    private val firstStructureLayer = listOf(
-        listOf(Blocks.GOLD_BLOCK, Blocks.PINK_WOOL, Blocks.GOLD_BLOCK),
-        listOf(Blocks.PINK_WOOL, Blocks.GOLD_BLOCK, Blocks.PINK_WOOL),
-        listOf(Blocks.GOLD_BLOCK, Blocks.PINK_WOOL, Blocks.GOLD_BLOCK)
-    )
-    private val secondStructureLayer = listOf(
-        listOf(Blocks.AIR, Blocks.PINK_WOOL, Blocks.AIR),
-        listOf(Blocks.PINK_WOOL, Blocks.GOLD_BLOCK, Blocks.PINK_WOOL),
-        listOf(Blocks.AIR, Blocks.PINK_WOOL, Blocks.AIR)
-    )
-    private val thirdStructureLayer = listOf(
-        listOf(Blocks.AIR, Blocks.PINK_WOOL, Blocks.AIR),
-        listOf(Blocks.PINK_WOOL, this, Blocks.PINK_WOOL),
-        listOf(Blocks.AIR, Blocks.PINK_WOOL, Blocks.AIR)
-    )
-    private val structureLayers = listOf(
-        firstStructureLayer, secondStructureLayer, thirdStructureLayer
+    private val altarStructure = listOf(
+        // Layer -2
+        BlockPos(-1, -2, -1) to Blocks.GOLD_BLOCK,
+        BlockPos( 0, -2, -1) to Blocks.PINK_WOOL,
+        BlockPos( 1, -2, -1) to Blocks.GOLD_BLOCK,
+        BlockPos(-1, -2,  0) to Blocks.PINK_WOOL,
+        BlockPos( 0, -2,  0) to Blocks.GOLD_BLOCK,
+        BlockPos( 1, -2,  0) to Blocks.PINK_WOOL,
+        BlockPos(-1, -2,  1) to Blocks.GOLD_BLOCK,
+        BlockPos( 0, -2,  1) to Blocks.PINK_WOOL,
+        BlockPos( 1, -2,  1) to Blocks.GOLD_BLOCK,
+        // Layer -1
+        BlockPos( 0, -1, -1) to Blocks.PINK_WOOL,
+        BlockPos(-1, -1,  0) to Blocks.PINK_WOOL,
+        BlockPos( 0, -1,  0) to Blocks.GOLD_BLOCK,
+        BlockPos( 1, -1,  0) to Blocks.PINK_WOOL,
+        BlockPos( 0, -1,  1) to Blocks.PINK_WOOL,
+        // Layer 0
+        BlockPos( 0,  0, -1) to Blocks.PINK_WOOL,
+        BlockPos(-1, 0,  0) to Blocks.PINK_WOOL,
+        BlockPos( 0,  0,  0) to this,
+        BlockPos( 1,  0,  0) to Blocks.PINK_WOOL,
+        BlockPos( 0,  0,  1) to Blocks.PINK_WOOL
     )
 
     private fun checkStructure(world: World, pos: BlockPos): Boolean {
-        var layerCounter = 0
-        for (layer in structureLayers) {
-            layerCounter++
-
-            var y = -(structureLayers.size - layerCounter)
-            var z = -1
-
-            for (line in layer) {
-                var x = -1
-
-                for (block in line) {
-                    if (block != world.getBlockState(pos.add(x, y, z)).block) {
-//                        PSO.LOGGER.info(
-//                            "(AltarGlass tick) Wrong block:\n" +
-//                            "\tOn ${pos.add(x, y, z).toShortString()} (${world.getBlockState(BlockPos(x, y, z)).block.name.string})\n" +
-//                            "\tEternal indexes:\n" +
-//                            "\t\tlayer: ${structureLayers.indexOf(layer)}\n" +
-//                            "\t\tline: ${layer.indexOf(line)}\n" +
-//                            "\t\tblock: ${line.indexOf(block)}\n" +
-//                            "\t${block.name.string} expected"
-//                        )
-                        world.scheduleBlockTick(pos, this, 20)
-                        return false
-                    }
-                    x++
-                }
-                z++
+        for ((offset, expectedBlock) in altarStructure) {
+            val checkPos = pos.add(offset)
+            if (world.getBlockState(checkPos).block != expectedBlock) {
+                world.scheduleBlockTick(pos, this, 20)
+                return false
             }
         }
-
         return true
     }
 
+    private fun sendPrayFeedback(
+        world: World,
+        player: PlayerEntity,
+        sound: net.minecraft.sound.SoundEvent,
+        msgKey: String,
+        format: Formatting
+    ) {
+        world.playSound(null, BlockPos.ofFloored(player.pos), sound, SoundCategory.AMBIENT)
+        player.sendMessage(Text.translatable("${PSO.MODID}.$msgKey").formatted(format))
+    }
+
     @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
-    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: net.minecraft.util.math.random.Random) {
+    override fun scheduledTick(state: BlockState, world: ServerWorld, pos: BlockPos, random: Random) {
         if (!checkStructure(world, pos)) return
 
-        val players = world.getPlayers { player ->
-            player.squaredDistanceTo(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()) < 100
+        val players = world.getPlayers {
+            it.squaredDistanceTo(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5) < 100
         }
 
         if (players.isNotEmpty()) {
             val player = players[0]
             val advancement = world.server.advancementLoader.get(Identifier("${PSO.MODID}/make_altar"))
-
-            if (advancement != null) {
-                val progress = player.advancementTracker.getProgress(advancement)
-
+            advancement?.let {
+                val progress = player.advancementTracker.getProgress(it)
                 for (criterion in progress.unobtainedCriteria) {
-                    player.advancementTracker.grantCriterion(advancement, criterion)
+                    player.advancementTracker.grantCriterion(it, criterion)
                 }
             }
-        } else { world.scheduleBlockTick(pos, this, 20) }
+        } else {
+            world.scheduleBlockTick(pos, this, 20)
+        }
     }
 
     @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
-        if (!world.isClient) { world.scheduleBlockTick(pos, this, 0) }
+        if (!world.isClient) {
+            world.scheduleBlockTick(pos, this, 0)
+        }
     }
 
     @Deprecated("https://www.reddit.com/r/fabricmc/comments/r8zi36/deprecation/")
@@ -113,23 +110,21 @@ class AltarGlass : ModObject.ModBlock(Settings.copy(Blocks.GLASS).nonOpaque()) {
         player: PlayerEntity,
         hand: Hand,
         hit: BlockHitResult
-    ): ActionResult? {
+    ): ActionResult {
         if (world.isClient) return ActionResult.SUCCESS
 
         if (!checkStructure(world, pos)) {
-            player.sendMessage(Text.translatable("${PSO.MODID}.pray.failed").formatted(Formatting.RED))
+            sendPrayFeedback(world, player, SoundEvents.BLOCK_LARGE_AMETHYST_BUD_PLACE, "pray.failed", Formatting.RED)
             return ActionResult.SUCCESS
         }
 
         if (PraySubConfig.didPray(player.gameProfile)) {
-            world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_LARGE_AMETHYST_BUD_PLACE, SoundCategory.AMBIENT)
-            player.sendMessage(Text.translatable("${PSO.MODID}.pray.already").formatted(Formatting.RED))
+            sendPrayFeedback(world, player, SoundEvents.BLOCK_LARGE_AMETHYST_BUD_PLACE, "pray.already", Formatting.RED)
             return ActionResult.SUCCESS
         }
 
         PraySubConfig.pray(player.gameProfile)
-        world.playSound(null, BlockPos.ofFloored(player.pos), SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.AMBIENT)
-        player.sendMessage(Text.translatable("${PSO.MODID}.pray.success").formatted(Formatting.DARK_GREEN))
+        sendPrayFeedback(world, player, SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, "pray.success", Formatting.DARK_GREEN)
 
         return ActionResult.SUCCESS
     }
