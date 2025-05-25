@@ -16,11 +16,13 @@ object PlayerPickupItem {
     }
 
     fun deniedItemsCheck(inventory: PlayerInventory, slot: Int, stack: ItemStack): ActionResult {
-        var denyList = DenyListConfig.getDenyList()
-        var reward = denyList.getOrElse(stack.item.translationKey) { 0 }
+        val itemId = stack.item.translationKey
 
-        if (!denyList.contains(stack.item.translationKey)) { return ActionResult.PASS }
-        var deniedItemsCount = inventory.getStack(slot).count
+        if (!DenyListConfig.isAlreadyInDenyList(itemId))
+            return ActionResult.PASS
+
+        val reward = DenyListConfig.getReward(itemId)?: 0
+        val deniedItemsCount = inventory.getStack(slot).count
 
         inventory.removeStack(slot)
         inventory.offerOrDrop(ItemStack(ModItems.SVOBUCKS, reward * deniedItemsCount))

@@ -1,6 +1,5 @@
 package zwylair.pisskaland_overhaul.config
 
-import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import zwylair.pisskaland_overhaul.config.Config.denyListData
 import zwylair.pisskaland_overhaul.config.Config.saveConfig
@@ -22,5 +21,9 @@ object DenyListConfig {
 
     fun getDenyList(): Map<String, Int> {
         return denyListData.entrySet().associate { it.key to it.value.asInt }
+    }
+
+    fun getReward(itemId: String): Int? {
+        return getDenyList()[itemId]
     }
 }
